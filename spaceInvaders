@@ -59,7 +59,7 @@ class Block(pg.sprite.Sprite):
         if self.rect.y > 410:
             self.reset_pos()
 # Chargement du background (bg)
-bg_img = pg.image.load("C:/Users/nilsr/Documents/handigital/python/jeu/graph/scroll.png").convert()
+bg_img = pg.image.load(io.BytesIO(requests.get(IMAGE_SCROLL).content)).convert()
 bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))
 bg_height = bg_img.get_height()
 bg_y = 0
