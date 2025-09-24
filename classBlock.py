@@ -1,8 +1,12 @@
+import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
+
+
 class Block(pg.sprite.Sprite):
     """
     This class represents the ball
     It derives from the "Sprite" class in Pygame
     """
+    
     def __init__(self, color, width, height):
         """ Constructor. Pass in the color of the block,
         and its x and y position. """
