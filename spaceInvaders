@@ -1,6 +1,9 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import requests, io
 import random as rdm
+from classBlock import Block            # ou import classBlock 
+from defClamp import clamp
+from defMove_and_collide import move_and_collide
 
 ################# variables constantes ######https://github.com/Phosnay/spaceInvaders/blob/main/graph/player_pygame.png################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
@@ -22,48 +25,10 @@ player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)   # rect
 player_img = pg.image.load(io.BytesIO(requests.get(IMAGE_VAISSEAU).content)).convert_alpha()
 player_img = pg.transform.scale(player_img, (SIZE, SIZE)) 
 
-# --- laser ---
+############################## laser du vaisseau ##################################
 player_laser = pg.image.load(io.BytesIO(requests.get(IMAGE_MUNITION_VAISSEAU).content)).convert_alpha()
 
 
-class Block(pg.sprite.Sprite):
-    """
-    This class represents the ball
-    It derives from the "Sprite" class in Pygame
-    """
-    def __init__(self, color, width, height):
-        """ Constructor. Pass in the color of the block,
-        and its x and y position. """
-        # Call the parent class (Sprite) constructor
-        super().__init__()
- 
-        # Create an image of the block, and fill it with a color.
-        # This could also be an image loaded from the disk.
-        self.image = pg.Surface([width, height])
-        self.image.fill(color)
- 
-        # Fetch the rectangle object that has the dimensions of the image
-        # image.
-        # Update the position of this object by setting the values
-        # of rect.x and rect.y
-        self.rect = self.image.get_rect()
- 
-    def reset_pos(self):
-        """ Reset position to the top of the screen, at a random x location.
-        Called by update() or the main program loop if there is a collision.
-        """
-        self.rect.y = rdm.randrange(-300, -20)
-        self.rect.x = rdm.randrange(0, WIDTH)
- 
-    def update(self):
-        """ Called each frame. """
- 
-        # Move block down one pixel
-        self.rect.y += 1
- 
-        # If block is too far down, reset to top of screen.
-        if self.rect.y > 410:
-            self.reset_pos()
 # Chargement du background (bg)
 bg_img = pg.image.load(io.BytesIO(requests.get(IMAGE_SCROLL).content)).convert()
 bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))
@@ -79,29 +44,6 @@ walls = []
 #     pg.Rect(300, 210, 200, 24),
 # ]
 
-def clamp(r):
-    r.left = max(0, r.left); r.top = max(0, r.top)
-    r.right = min(WIDTH, r.right); r.bottom = min(HEIGHT, r.bottom)
-
-# Définition de la fonction missile qui permet d'afficher les missiles sur la position du player/joueur
-def missile(player):
-    missile = pg.Rect(player.x, player.y, 25, 25)
-    pg.draw.rect(screen, WCOLOR, missile)
-    print("Missile créé")
-
-def move_and_collide(r, dx, dy, speed, dt, walls):
-    # X
-    r.x += int(dx * speed * dt)
-    for w in walls:
-        if r.colliderect(w):
-            if dx > 0:  r.right = w.left
-            elif dx < 0: r.left  = w.right
-    # Y
-    r.y += int(dy * speed * dt)
-    for w in walls:
-        if r.colliderect(w):
-            if dy > 0:  r.bottom = w.top
-            elif dy < 0: r.top   = w.bottom
 
 # --- Boucle principale ---
 running = True
