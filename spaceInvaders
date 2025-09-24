@@ -19,8 +19,8 @@ IMAGE_MUNITION_VAISSEAU = "https://github.com/Phosnay/spaceInvaders/blob/main/gr
 pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
-############################## vaisseau ##################################
 
+############################## vaisseau ##################################
 player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)   # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
 player_img = pg.image.load(io.BytesIO(requests.get(IMAGE_VAISSEAU).content)).convert_alpha()
 player_img = pg.transform.scale(player_img, (SIZE, SIZE)) 
