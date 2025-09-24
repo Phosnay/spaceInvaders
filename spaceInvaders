@@ -1,5 +1,5 @@
 import pygame as pg, sys
-
+import random as rdm
 # --- Config ---
 WIDTH, HEIGHT, FPS = 800, 800, 60
 BG = (24,26,32); WCOLOR = (200,80,80)
@@ -11,10 +11,53 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 clock = pg.time.Clock()
 
 # --- Joueur ---
-player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//2 - SIZE//2, SIZE, SIZE)
+player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)
+player
 player_img = pg.image.load("C:/Users/nilsr/Documents/handigital/python/jeu/graph/player_pygame.png").convert_alpha()
-player_img = pg.transform.scale(player_img, (SIZE, SIZE)) 
+player_img = pg.transform.scale(player_img, (SIZE, SIZE))
 
+# --- laser ---
+player_laser = pg.image.load("C:/Users/nilsr/Documents/handigital/python/jeu/graph/munition50.png").convert_alpha()
+
+
+class Block(pg.sprite.Sprite):
+    """
+    This class represents the ball
+    It derives from the "Sprite" class in Pygame
+    """
+    def __init__(self, color, width, height):
+        """ Constructor. Pass in the color of the block,
+        and its x and y position. """
+        # Call the parent class (Sprite) constructor
+        super().__init__()
+ 
+        # Create an image of the block, and fill it with a color.
+        # This could also be an image loaded from the disk.
+        self.image = pg.Surface([width, height])
+        self.image.fill(color)
+ 
+        # Fetch the rectangle object that has the dimensions of the image
+        # image.
+        # Update the position of this object by setting the values
+        # of rect.x and rect.y
+        self.rect = self.image.get_rect()
+ 
+    def reset_pos(self):
+        """ Reset position to the top of the screen, at a random x location.
+        Called by update() or the main program loop if there is a collision.
+        """
+        self.rect.y = rdm.randrange(-300, -20)
+        self.rect.x = rdm.randrange(0, WIDTH)
+ 
+    def update(self):
+        """ Called each frame. """
+ 
+        # Move block down one pixel
+        self.rect.y += 1
+ 
+        # If block is too far down, reset to top of screen.
+        if self.rect.y > 410:
+            self.reset_pos()
 # Chargement du background (bg)
 bg_img = pg.image.load("C:/Users/nilsr/Documents/handigital/python/jeu/graph/scroll.png").convert()
 bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))
@@ -55,6 +98,10 @@ while running:
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
+    # AUTOMATIQUE
+    
+    # POS
+    player_pos = 
 
     # INPUT
     k = pg.key.get_pressed()
@@ -65,7 +112,7 @@ while running:
     move_and_collide(player, dx, dy, SPEED, dt, walls)
     clamp(player)
 
-    # Scroll du background
+    # Défillement du background
     bg_y += SCROLL_SPEED * dt
     if bg_y >= bg_height:
         bg_y = 0
