@@ -2,8 +2,9 @@ import pygame as pg, sys                # sys = module qui permet d'interagir av
 import requests, io
 import random as rdm
 from classBlock import Block            # ou import classBlock 
-from defClamp import clamp
-from defMove_and_collide import move_and_collide
+from fonctions.defClamp import clamp
+from fonctions.defMove_and_collide import move_and_collide
+from fonctions.defMissile import missile
 
 ################# variables constantes ######https://github.com/Phosnay/spaceInvaders/blob/main/graph/player_pygame.png################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
