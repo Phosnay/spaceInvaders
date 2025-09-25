@@ -9,7 +9,6 @@ WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables 
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
 SIZE, SPEED = 36, 220                   # affectation multiple pour 2 variables
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
-SPACE = 10
 
 ################# initialisation des modules Pygame ######################
 pg.init()
@@ -65,7 +64,7 @@ while running:
     # trouver comment lancer toutes les 1 seconde au ein du running
     # On appelle la fonction missile qui affiche les missiles
     missile(player, screen, WCOLOR,)
-    displayEnnemies(screen, WIDTH, SIZE, SPACE)
+    displayEnnemies(screen, WIDTH, SIZE)
 
 
     # LOGIQUE
