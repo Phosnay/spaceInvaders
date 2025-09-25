@@ -1,3 +1,7 @@
+# r = player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE) 
+# dx = vaut +1 vers la droite, -1 vers la gauche, 0 sinon
+# dy = vaut +1 vers le bas, -1 vers le haut, 0 sinon
+
 def move_and_collide(r, dx, dy, speed, dt, walls):
     # X
     r.x += int(dx * speed * dt)
