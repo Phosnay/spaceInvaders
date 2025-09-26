@@ -74,8 +74,7 @@ while running:
     move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
     directionOfMouvement(enemyGroup, WIDTH, SIZE)
     enemyGroup.update(ENEMYSTART_X)
-    # trouver comment lancer toutes les 1 seconde au ein du running
-    # On appelle la fonction missile qui affiche les missiles
+
     # Mise à jour des missiles
     for m in missiles[:]:
         m.y -= 7
@@ -91,10 +90,6 @@ while running:
     # LOGIQUE
     move_and_collide(player, dx, dy, SPEED, dt, walls)
     clamp(WIDTH, HEIGHT, player)
-
-
-    # trouver comment lancer toutes les 1 seconde au ein du running
-    # On appelle la fonction missile qui affiche les missiles
 
     for w in walls:
         pg.draw.rect(screen, WCOLOR, w)
