@@ -1,10 +1,10 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 
 
-"""
-Enemy hérite de pygame.sprite.Sprite.  
-Cela permettra d'utiliser toutes les fonctionnalités de pygame.sprite.Group 
-(affichage, collisions, suppression, etc.).
+
+""" Enemy hérite de pygame.sprite.Sprite.  
+    Cela permettra d'utiliser toutes les fonctionnalités de pygame.sprite.Group 
+    (affichage, collisions, suppression, etc.).
 """
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, image, powerEnemy):
@@ -15,9 +15,8 @@ class Enemy(pg.sprite.Sprite):
         self.powerEnemy = powerEnemy
 
     def update(self, dx=0, dy=0):
-        """
-        Cette méthode est appelée par Group.update(*args).
-        Ici elle applique un déplacement (dx, dy) en pixels.
+        """ Cette méthode est appelée par Group.update(*args).
+            Ici elle applique un déplacement (dx, dy) en pixels.
         """
         self.rect.x += int(dx)
         self.rect.y += int(dy)

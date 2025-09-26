@@ -3,10 +3,10 @@ from classes.classEnemy import Enemy            # ou import classBlock
 
 
 ################ instanciation des ennemis ###########################""
-def fillEnemies(ROWS, COLS, WIDTH, SIZE):
-    enemies = pg.sprite.Group()    # conteneur gérant plusieurs sprites.
-    SPACE_X, SPACE_Y = 10, 8
-    START_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2
+def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
+    enemyGroup = pg.sprite.Group()                             # conteneur gérant plusieurs sprites.
+    SPACE_X, SPACE_Y = 10, 3                                # espacement entre les rangés et les lignes
+    START_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
     START_Y = 100
     enemyStrong_img = pg.image.load("graph/space10.1.png").convert_alpha()     # chargement d'une image, en gardant la transparence
     enemyStrong_img = pg.transform.scale(enemyStrong_img, (SIZE, SIZE))
@@ -29,8 +29,8 @@ def fillEnemies(ROWS, COLS, WIDTH, SIZE):
                 image = enemyWeak_img
                 powerEnemy = 1
             e = Enemy(x, y, image, powerEnemy)
-            enemies.add(e)
-    return enemies
+            enemyGroup.add(e)
+    return enemyGroup
 
 ################ déplacement des ennemis ###########################""
 # enemy.x = position de enemy sur l'axe des x
