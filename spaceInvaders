@@ -43,17 +43,18 @@ walls = []
 # ]
 
 missiles = [] #On stocke les missiles
-tirMissile = pg.USEREVENT + 1
-pg.time.set_timer(tirMissile, 1000) #Tir d'un missile par seconde
+tirMissilePlayer = pg.USEREVENT + 1
+pg.time.set_timer(tirMissilePlayer, 1000) #Tir d'un missile par seconde
 
 ############################## Boucle principale ##################################
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
+    score += 1
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
-        elif e.type == tirMissile:
+        elif e.type == tirMissilePlayer:
             missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
 
     #--- affichages -------------------------------------------------------------
