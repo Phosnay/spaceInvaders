@@ -1,9 +1,13 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
+import time
 
 def missile(player, screen, WCOLOR):
-    missile = pg.Rect(player.x, player.y, 25, 25)
+    missile = pg.Rect(player.x + 6.5, player.y, 25, 25)
     pg.draw.rect(screen, WCOLOR, missile)
+<<<<<<< HEAD
+=======
     #print("Missile créé")
+>>>>>>> 43b2be60d7dde168a30789d2878291348a10a792
 
 def clamp(WIDTH, HEIGHT, r):
     r.left = max(0, r.left); r.top = max(0, r.top)
