@@ -1,12 +1,13 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 from classes.classEnemy import Enemy            # ou import classBlock 
 
+SPACE_X, SPACE_Y = 10, 3                                # espacement entre les rangés et les lignes
+START_Y = 100
+
 ################ instanciation des ennemis ###########################""
 def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
+    Start_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
     enemyGroup = pg.sprite.Group()                             # conteneur gérant plusieurs sprites.
-    SPACE_X, SPACE_Y = 10, 3                                # espacement entre les rangés et les lignes
-    START_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
-    START_Y = 100
     enemyStrong_img = pg.image.load("graph/space10.1.png").convert_alpha()     # chargement d'une image, en gardant la transparence
     enemyStrong_img = pg.transform.scale(enemyStrong_img, (SIZE, SIZE))
     enemyMedium_img = pg.image.load("graph/space12.1.png").convert_alpha()
@@ -15,7 +16,7 @@ def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
     enemyWeak_img = pg.transform.scale(enemyWeak_img, (SIZE, SIZE))
     for row in range(ROWS):
         for col in range(COLS):
-            x = START_X + col * (SIZE + SPACE_X)
+            x = Start_X + col * (SIZE + SPACE_X)
             y = START_Y + row * (SIZE + SPACE_Y)
             # selon la rangée, changer l'image des ennemis
             if row < 1:
@@ -34,3 +35,11 @@ def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
 ################ déplacement des ennemis ###########################""
 # enemy.x = position de enemy sur l'axe des x
 # enemy.y = position de enemy sur l'axe des y
+def directionOfMouvement(enemyGroup, WIDTH, SIZE):
+    inScreen = True
+    for enemy in enemyGroup:
+        if enemy.rect.x + SIZE >= WIDTH or enemy.rect.x < 0:
+            inScreen = False
+    if inScreen == False:
+        for enemy in enemyGroup:
+            enemy.speed *= -1
