@@ -1,38 +1,43 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
-from classBlock import Block            # ou import classBlock 
+from classes.classBlock import Block            # ou import classBlock 
 from fonctions.defMove_and_collide import move_and_collide
 from fonctions.vaisseau import missile, clamp
-
-################# variables constantes ######https://github.com/Phosnay/spaceInvaders/blob/main/graph/player_pygame.png################
+from fonctions.ennemis import fillEnemies
+################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
 SIZE, SPEED = 36, 220                   # affectation multiple pour 2 variables
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
+<<<<<<< HEAD
 # --- Images --- #
 IMAGE_VAISSEAU = "graph/vaisseau01.png"
 IMAGE_SCROLL = "graph/scrollCropped.png"
 IMAGE_MUNITION_VAISSEAU = "graph/munition50.png"
+=======
+
+>>>>>>> 43b2be60d7dde168a30789d2878291348a10a792
 ################# initialisation des modules Pygame ######################
 pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 
-############################## vaisseau ##################################
-player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)   # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
-player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()
+############################## image du background ##################################
+bg_img = pg.image.load("graph/scroll.png").convert()    # chargement d'une image
+bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))    # impose une taille à l'image, celle de la fenêtre
+bg_height = bg_img.get_height()                         # récupère la hauteur originale de l'image en pixels
+bg_y = 0
 
-player_img = pg.transform.scale(player_img, (SIZE, SIZE)) 
+############################## image du vaisseau ##################################
+player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)     # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
+player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
+player_img = pg.transform.scale(player_img, (SIZE, SIZE))
 
 ############################## laser du vaisseau ##################################
 player_laser = pg.image.load("graph/munition50.png").convert_alpha()
 
-
-# Chargement du background (bg)
-bg_img = pg.image.load("graph/scroll.png").convert()
-bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))
-bg_height = bg_img.get_height()
-bg_y = 0
+############################## création des ennemis ##################################
+enemies = fillEnemies(6, 10, WIDTH, SIZE)
 
 # --- Murs ---
 walls = []
@@ -43,33 +48,45 @@ walls = []
 #     pg.Rect(300, 210, 200, 24),
 # ]
 
-
-# --- Boucle principale ---
+############################## Boucle principale ##################################
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000.0
+    dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
     # AUTOMATIQUE
+    screen.blit(bg_img, (0, 0))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
 
+<<<<<<< HEAD
     # INPUT
     k = pg.key.get_pressed()
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])
     dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])
+=======
+    #--- Défillement du background vers le bas ---
+    # bg_y += SCROLL_SPEED * dt                       # à chaque frame y augmente
+    # if bg_y >= bg_height:                           # quand y vaut la valeur de la hauteur de l'image du fond
+    #     bg_y = 0                                    # y repart à 0 : boucle infinie
+    # screen.blit(bg_img, (0, bg_y))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
+    # screen.blit(bg_img, (0, bg_y - bg_height))      # colle l'image juste au-dessous de la première
+
+    #--- détections des touches du clavier ---
+    k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
+    dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
+    dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
+ 
+ 
+    # trouver comment lancer toutes les 1 seconde au ein du running
+    # On appelle la fonction missile qui affiche les missiles
+    missile(player, screen, WCOLOR,)
+    enemies.draw(screen)
+>>>>>>> 43b2be60d7dde168a30789d2878291348a10a792
 
     # LOGIQUE
     move_and_collide(player, dx, dy, SPEED, dt, walls)
     clamp(WIDTH, HEIGHT, player)
 
-    # Défillement du background
-    bg_y += SCROLL_SPEED * dt
-    if bg_y >= bg_height:
-        bg_y = 0
-
-    # DESSIN
-    screen.blit(bg_img, (0, bg_y))         
-    screen.blit(bg_img, (0, bg_y - bg_height)) 
 
     # trouver comment lancer toutes les 1 seconde au ein du running
     # On appelle la fonction missile qui affiche les missiles
