@@ -1,19 +1,15 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
-from fonctions.defMove_and_collide import move_and_collide
-from fonctions.vaisseau import clamp
-from fonctions.ennemis import fillEnemies
+from fonctions.vaisseau import clamp, move_and_collide
+from fonctions.ennemis import fillEnemyGroup, directionOfMouvement
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
 SIZE, SPEED = 36, 220                   # affectation multiple pour 2 variables
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
-
-# --- Images --- #
-IMAGE_VAISSEAU = "graph/vaisseau01.png"
-IMAGE_SCROLL = "graph/scrollCropped.png"
-IMAGE_MUNITION_VAISSEAU = "graph/munition50.png"
+ENEMYSPACE_X= 10                                # espacement entre les rangés
+ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
 
 ################# initialisation des modules Pygame ######################
 pg.init()
@@ -35,7 +31,7 @@ player_img = pg.transform.scale(player_img, (SIZE, SIZE))
 player_laser = pg.image.load("graph/munition50.png").convert_alpha()
 
 ############################## création des ennemis ##################################
-enemies = fillEnemies(6, 10, WIDTH, SIZE)
+enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)
 
 # --- Murs ---
 walls = []
@@ -60,23 +56,24 @@ while running:
         elif e.type == tirMissile:
             missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
 
-    # AUTOMATIQUE
-    screen.blit(bg_img, (0, 0))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
+    #--- affichages -------------------------------------------------------------
+    screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
+    enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
+    clamp(WIDTH, HEIGHT, player)                # pose des limites pour rester dans la fenêtre
+                        # for w in walls:
+                        #     pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
+    screen.blit(player_img, player.topleft)     # affiche le vaisseau
 
-    # INPUT
-    #--- Défillement du background vers le bas ---
-    # bg_y += SCROLL_SPEED * dt                       # à chaque frame y augmente
-    # if bg_y >= bg_height:                           # quand y vaut la valeur de la hauteur de l'image du fond
-    #     bg_y = 0                                    # y repart à 0 : boucle infinie
-    # screen.blit(bg_img, (0, bg_y))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
-    # screen.blit(bg_img, (0, bg_y - bg_height))      # colle l'image juste au-dessous de la première
 
-    #--- détections des touches du clavier ---
+    #--- détections des touches du clavier ----------------------------------------
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
     dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
  
- 
+    #--- déplacements ----------------------------------------
+    move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
+    directionOfMouvement(enemyGroup, WIDTH, SIZE)
+    enemyGroup.update(ENEMYSTART_X)
     # trouver comment lancer toutes les 1 seconde au ein du running
     # On appelle la fonction missile qui affiche les missiles
     # Mise à jour des missiles
@@ -105,4 +102,14 @@ while running:
     pg.display.flip()
 
 pg.quit(); sys.exit()
- 
+
+
+
+####################### code en attente ou abandonné pour l'instant ##################################
+
+#--- Défillement du background vers le bas ---
+# bg_y += SCROLL_SPEED * dt                       # à chaque frame y augmente
+# if bg_y >= bg_height:                           # quand y vaut la valeur de la hauteur de l'image du fond
+#     bg_y = 0                                    # y repart à 0 : boucle infinie
+# screen.blit(bg_img, (0, bg_y))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
+# screen.blit(bg_img, (0, bg_y - bg_height))      # colle l'image juste au-dessous de la première

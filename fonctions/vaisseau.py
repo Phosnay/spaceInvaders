@@ -4,3 +4,21 @@ import time
 def clamp(WIDTH, HEIGHT, r):
     r.left = max(0, r.left); r.top = max(0, r.top)
     r.right = min(WIDTH, r.right); r.bottom = min(HEIGHT, r.bottom)
+
+# r = player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE) 
+# dx = vaut +1 vers la droite, -1 vers la gauche, 0 sinon
+# dy = vaut +1 vers le bas, -1 vers le haut, 0 sinon
+
+def move_and_collide(r, dx, dy, speed, dt, walls):
+    # X
+    r.x += int(dx * speed * dt)
+    for w in walls:
+        if r.colliderect(w):
+            if dx > 0:  r.right = w.left
+            elif dx < 0: r.left  = w.right
+    # Y
+    r.y += int(dy * speed * dt)
+    for w in walls:
+        if r.colliderect(w):
+            if dy > 0:  r.bottom = w.top
+            elif dy < 0: r.top   = w.bottom
