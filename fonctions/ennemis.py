@@ -1,7 +1,6 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 from classes.classEnemy import Enemy            # ou import classBlock 
 
-
 ################ instanciation des ennemis ###########################""
 def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
     enemyGroup = pg.sprite.Group()                             # conteneur gérant plusieurs sprites.
