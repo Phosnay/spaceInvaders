@@ -1,9 +1,9 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 from classes.classEnemy import Enemy            # ou import classBlock 
 
-SPACE_X, SPACE_Y = 10, 3                                # espacement entre les rangés et les lignes
-START_Y = 100
-
+SPACE_X, SPACE_Y = 10, 3        # espacement entre les rangés, les lignes
+START_Y = 100                   # distance entre le haut de l'écran et la position des ennemis au début du jeu 
+DOWN = 10                       # distance de chaque déplacement des ennemis vers le bas
 ################ instanciation des ennemis ###########################""
 def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
     Start_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
@@ -33,8 +33,6 @@ def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
     return enemyGroup
 
 ################ déplacement des ennemis ###########################""
-# enemy.x = position de enemy sur l'axe des x
-# enemy.y = position de enemy sur l'axe des y
 def directionOfMouvement(enemyGroup, WIDTH, SIZE):
     inScreen = True
     for enemy in enemyGroup:
@@ -42,4 +40,5 @@ def directionOfMouvement(enemyGroup, WIDTH, SIZE):
             inScreen = False
     if inScreen == False:
         for enemy in enemyGroup:
-            enemy.speed *= -1
+            enemy.speed *= -1           # changement de direction
+            enemy.rect.y += DOWN
