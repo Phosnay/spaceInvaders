@@ -11,7 +11,7 @@ SIZE, SPEED = 36, 220                   # affectation multiple pour 2 variables
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
 # --- Images --- #
 IMAGE_VAISSEAU = "graph/vaisseau01.png"
-IMAGE_SCROLL = "graph/scroll.png"
+IMAGE_SCROLL = "graph/scrollCropped.png"
 IMAGE_MUNITION_VAISSEAU = "graph/munition50.png"
 ################# initialisation des modules Pygame ######################
 pg.init()
@@ -53,10 +53,6 @@ while running:
             running = False
     # AUTOMATIQUE
 
-    # trouver comment lancer toutes les 1 seconde au ein du running
-    # On appelle la fonction missile qui affiche les missiles
-    missile(player, screen, WCOLOR,)
-
     # INPUT
     k = pg.key.get_pressed()
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])
@@ -74,6 +70,10 @@ while running:
     # DESSIN
     screen.blit(bg_img, (0, bg_y))         
     screen.blit(bg_img, (0, bg_y - bg_height)) 
+
+    # trouver comment lancer toutes les 1 seconde au ein du running
+    # On appelle la fonction missile qui affiche les missiles
+    missile(player, screen, WCOLOR,)
 
     for w in walls:
         pg.draw.rect(screen, WCOLOR, w)
