@@ -20,13 +20,12 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
 pv_joueur = 1                                   # Initialisation des pv (joueur)
+missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
+missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
 # -------- Optionnel : créer un événement pour tirer automatiquement
 MISSILE_EVENT = pg.USEREVENT + 1        # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
 pg.time.set_timer(MISSILE_EVENT, 1000)  # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement un événement dans la file des événements (pg.event.get()).
                                         # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
-missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
-missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
-score = 0
 
 ############################## image du background ##################################
 bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()    # chargement d'une image
