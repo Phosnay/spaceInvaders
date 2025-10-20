@@ -51,7 +51,11 @@ tirerMissilesPlayer(tirMissilePlayer)
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
+<<<<<<< HEAD
     #score += 1
+=======
+    # score += 1
+>>>>>>> a1b89ebfa7d17dd3f346f6a74b6aca4ba61287ea
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
