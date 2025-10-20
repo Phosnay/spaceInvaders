@@ -1,7 +1,9 @@
+"""Nils : Finir refactoring missile, affichage des infos/barres infos, affichage menus"""
+
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
-from fonctions.vaisseau import clamp, move_and_collide
+from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, tirerMissilesPlayer 
 from fonctions.ennemis import fillEnemyGroup, directionOfMouvement
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
@@ -41,21 +43,20 @@ walls = []
 #     pg.Rect(626, 80, 24, 324),
 #     pg.Rect(300, 210, 200, 24),
 # ]
+missilesStock = [] #On stocke les missiles
 
-missiles = [] #On stocke les missiles
-tirMissilePlayer = pg.USEREVENT + 1
-pg.time.set_timer(tirMissilePlayer, 1000) #Tir d'un missile par seconde
+tirerMissilesPlayer(tirMissilePlayer)
 
 ############################## Boucle principale ##################################
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
-    score += 1
+    #score += 1
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
-        elif e.type == tirMissilePlayer:
-            missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
+        elif e.type == missilesPlayer.tirMissilePlayer:
+            missilesPlayer.missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
 
     #--- affichages -------------------------------------------------------------
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
@@ -76,16 +77,8 @@ while running:
     directionOfMouvement(enemyGroup, WIDTH, SIZE)
     enemyGroup.update(ENEMYSTART_X)
 
-    # Mise à jour des missiles
-    for m in missiles[:]:
-        m.y -= 7
-        if m.bottom < 0:
-            missiles.remove(m)
-    
-    for m in missiles:
-        pg.draw.rect(screen, (0, 255, 0), m)
-    pg.display.flip()
-    clock.tick(60)
+    #---?---#
+    missilesPlayer(clock, missiles, screen)
 
 
     # LOGIQUE
