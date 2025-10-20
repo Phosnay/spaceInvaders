@@ -3,7 +3,7 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
-from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau 
+from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau, pv_vaisseau
 from fonctions.ennemis import fillEnemyGroup, directionOfMouvement
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
@@ -17,18 +17,26 @@ ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionneme
 pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
-score = 0
+score = 0                                       # initialisation du score
+pv_joueur = 1                                   # Initialisation des pv (joueur)
 
 ############################## image du background ##################################
 bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()    # chargement d'une image
 bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))    # impose une taille à l'image, celle de la fenêtre
 bg_height = bg_img.get_height()                         # récupère la hauteur originale de l'image en pixels
 bg_y = 0
+gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
+gameover_img = pg.transform.scale(gameover_img, (WIDTH, HEIGHT))
 
 ############################## image du vaisseau ##################################
 player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)     # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
 player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
 player_img = pg.transform.scale(player_img, (SIZE, SIZE))
+#Img infos vaisseau#
+fheart = pg.image.load("graph/fullheart.png").convert_alpha()
+fheart = pg.transform.scale(fheart, (50, 50))
+eheart = pg.image.load("graph/emptyheart.png").convert_alpha()
+eheart = pg.transform.scale(eheart, (50, 50))
 
 ############################## laser du vaisseau ##################################
 player_laser = pg.image.load("graph/munition50.png").convert_alpha()
@@ -65,17 +73,24 @@ while running:
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
     enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
     clamp(WIDTH, HEIGHT, player)                # pose des limites pour rester dans la fenêtre
-                        # for w in walls:
-                        #     pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
+                                                                    # for w in walls:
+                                                                    # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
-    text = font.render(f"Score : {score}", True, (255, 255, 255))  # crée une surface "texte" pour le score
+    text = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
     screen.blit(text, (650, 10))                 # affiche le score en haut à droite
-
+    pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
     #--- détections des touches du clavier ----------------------------------------
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
     dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
- 
+    
+    #A RETIRER TEMPORAIRE POUR TESTS#
+    if pg.K_o:
+        pv_joueur += 1
+    if pg.K_p:
+        pv_joueur -= 1
+    #A RETIRER TEMPORAIRE POUR TESTS#
+
     #--- déplacements ----------------------------------------
     move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
     directionOfMouvement(enemyGroup, WIDTH, SIZE)
