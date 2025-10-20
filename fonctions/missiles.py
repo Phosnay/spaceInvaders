@@ -3,7 +3,7 @@ from classes.classMissile import Missile
 
 
 ################ instanciation des missiles ###########################
-def missileGroup(x, y, POWER, SIZE, wich):
+def creationMissile(x, y, POWER, SIZE, wich):
     """
     Crée un groupe contenant un missile.
     x, y : position de départ
@@ -11,7 +11,6 @@ def missileGroup(x, y, POWER, SIZE, wich):
     SIZE : taille de référence pour l'image
     wich : "vaisseau" ou "enemy"
     """
-    group = pg.sprite.Group()
     
     # chargement de l'image 
     if wich == "vaisseau":
@@ -25,10 +24,5 @@ def missileGroup(x, y, POWER, SIZE, wich):
 
     # instancier le missile
     missile = Missile(x, y, missile_img, POWER)
-    group.add(missile)
-
-    # Optionnel : créer un événement pour tirer automatiquement
-    MISSILE_EVENT = pg.USEREVENT + 1
-    pg.time.set_timer(MISSILE_EVENT, 1000)
     
-    return group
+    return missile

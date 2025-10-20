@@ -5,7 +5,7 @@ import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
 from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau 
 from fonctions.ennemis import fillEnemyGroup, directionOfMouvement, detectCollision
-from fonctions.missiles import missileGroup
+from fonctions.missiles import creationMissile
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
@@ -18,6 +18,12 @@ ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionneme
 pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
+# -------- Optionnel : créer un événement pour tirer automatiquement
+MISSILE_EVENT = pg.USEREVENT + 1        # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
+pg.time.set_timer(MISSILE_EVENT, 1000)  # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement un événement dans la file des événements (pg.event.get()).
+                                        # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
+missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
+missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
 score = 0
 
 ############################## image du background ##################################
@@ -37,9 +43,6 @@ player_laser = pg.image.load("graph/munition50.png").convert_alpha()
 ############################## création des ennemis ##################################
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
 
-missileVaisseauGroup = missileGroup(player.centerx - 5, player.top - 10, 1, SIZE, "vaisseau")
-
-
 # --- Murs ---
 walls = []
 #     pg.Rect(150, 80, 500, 24),
@@ -49,20 +52,21 @@ walls = []
 #     pg.Rect(300, 210, 200, 24),
 # ]
 
-missiles = [] #On stocke les missiles
 
-NouvMissile = creerMissilesVaisseau()  #création d'un missile par seconde
 
 ############################## Boucle principale ##################################
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
-    font = pg.font.SysFont("Arial", 24, True) # police pour affichage texte
+    dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
+    font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
+
+    # ------------ Chaque seconde, un missile est créé automatiquement sans appuyer sur une touche.
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
-        elif e.type == NouvMissile:
-            missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
+        elif e.type == MISSILE_EVENT:
+            nouvMissile = creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 2), "vaisseau")
+            missilesVaisseau.add(nouvMissile)
             score += 1
 
     #--- affichages -------------------------------------------------------------
@@ -79,14 +83,18 @@ while running:
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
     dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
- 
+   
+    # -------- création d'un missile quand on appuie sur une touche
+    # TODO : si telle touche est appuyée alors:
+        # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
+
     #--- déplacements ----------------------------------------
     move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
     directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
     enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
      
     # Collision entre un missile et un ennemi
-    detectCollision(missiles, enemyGroup)
+    # detectCollision(missilesVaisseau, enemyGroup)
 
     # LOGIQUE
     move_and_collide(player, dx, dy, SPEED, dt, walls)

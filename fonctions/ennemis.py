@@ -50,9 +50,7 @@ def detectCollision(missiles, enemies):
     Détecte les collisions entre les missiles et les ennemis.
     Supprime le missile et l'ennemi touchés.
     """
-    # missiles étant une liste dont un élement va être supprimé, on en fait une copie ([:]) afin d'éviter des erreurs
-    # enemies étant un groupe de sprite dont un élément va être supprimé, on n'a pas besoin de faire une copie
-    for m in missiles[:]:
+    for m in missiles:
         # Vérifie la collision entre le missile et les ennemis
         collided = pg.sprite.spritecollide(m, enemies, dokill=True)     # dokill=True → supprime automatiquement les ennemis touchés de enemies pendant l’itération.
         if collided:                                                    # Si au moins un ennemi est touché
