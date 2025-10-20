@@ -78,6 +78,7 @@ while running:
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
     text = font.render(f"Score : {score}", True, (255, 255, 255))  # crée une surface "texte" pour le score
     screen.blit(text, (650, 10))                 # affiche le score en haut à droite
+    missilesVaisseau.draw(screen)                     # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
 
     #--- détections des touches du clavier ----------------------------------------
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier

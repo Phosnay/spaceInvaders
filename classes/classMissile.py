@@ -14,3 +14,8 @@ class Missile(pg.sprite.Sprite):
         self.powerMissile = powerMissile
         self.speed = 2
         
+    def update(self, dx=0):
+        """ Cette méthode est appelée par Group.update(dx, dy, largeur de screen).
+            Ici elle applique un déplacement (dx, dy) en pixels.
+        """
+        self.rect.x += self.speed    

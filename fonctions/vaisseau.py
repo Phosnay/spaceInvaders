@@ -25,7 +25,7 @@ def move_and_collide(r, dx, dy, speed, dt, walls):
 
 def missilesPlayer(screen, missiles):
     # Mise à jour des missiles
-    for m in missiles[:]:
+    for m in missiles:
         m.y -= 7
         if m.bottom < 0:
             missiles.remove(m)
