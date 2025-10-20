@@ -16,7 +16,7 @@ class Enemy(pg.sprite.Sprite):
         self.speed = 2
 
     def update(self, dx=0):
-        """ Cette méthode est appelée par Group.update(dx, dy, largeur de screen).
+        """ Cette méthode est appelée par enemyGroup.update(dx, dy, largeur de screen).
             Ici elle applique un déplacement (dx, dy) en pixels.
         """
         self.rect.x += self.speed                           # déplacement horizontal automatique
