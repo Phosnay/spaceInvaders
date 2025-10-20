@@ -1,7 +1,9 @@
+"""Nils : Finir refactoring missile, affichage des infos/barres infos, affichage menus"""
+
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
-from fonctions.vaisseau import clamp, move_and_collide
+from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau 
 from fonctions.ennemis import fillEnemyGroup, directionOfMouvement, detectCollision
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
@@ -15,6 +17,7 @@ ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionneme
 pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
+score = 0
 
 ############################## image du background ##################################
 bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()    # chargement d'une image
@@ -43,19 +46,20 @@ walls = []
 # ]
 
 missiles = [] #On stocke les missiles
-tirMissilePlayer = pg.USEREVENT + 1
-pg.time.set_timer(tirMissilePlayer, 1000)   # Tir d'un missile par seconde
+
+NouvMissile = creerMissilesVaisseau()  #création d'un missile par seconde
 
 ############################## Boucle principale ##################################
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
-    # score += 1
+    font = pg.font.SysFont("Arial", 24, True) # police pour affichage texte
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
-        elif e.type == tirMissilePlayer:
+        elif e.type == NouvMissile:
             missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
+            score += 1
 
     #--- affichages -------------------------------------------------------------
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
@@ -64,7 +68,8 @@ while running:
                         # for w in walls:
                         #     pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
-
+    text = font.render(f"Score : {score}", True, (255, 255, 255))  # crée une surface "texte" pour le score
+    screen.blit(text, (650, 10))                 # affiche le score en haut à droite
 
     #--- détections des touches du clavier ----------------------------------------
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
@@ -75,21 +80,9 @@ while running:
     move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
     directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
     enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
-
-    # Mise à jour des missiles
-    for m in missiles[:]:
-        m.y -= 7
-        if m.bottom < 0:
-            missiles.remove(m)
-    
+     
     # Collision entre un missile et un ennemi
     detectCollision(missiles, enemyGroup)
-
-    for m in missiles:
-        pg.draw.rect(screen, (0, 255, 0), m)
-    pg.display.flip()
-    clock.tick(60)
-
 
     # LOGIQUE
     move_and_collide(player, dx, dy, SPEED, dt, walls)
