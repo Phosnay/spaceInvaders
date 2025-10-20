@@ -22,7 +22,8 @@ def move_and_collide(r, dx, dy, speed, dt, walls):
         if r.colliderect(w):
             if dy > 0:  r.bottom = w.top
             elif dy < 0: r.top   = w.bottom
-def missilesPlayer(screen, clock, missiles):
+
+def missilesPlayer(screen, missiles):
     # Mise à jour des missiles
     for m in missiles[:]:
         m.y -= 7
@@ -32,8 +33,8 @@ def missilesPlayer(screen, clock, missiles):
     for m in missiles:
         pg.draw.rect(screen, (0, 255, 0), m)
     pg.display.flip()
-    clock.tick(60)
 
-def tirerMissilesPlayer(tirMissilePlayer):
-    tirMissilePlayer = pg.USEREVENT + 1
-    pg.time.set_timer(tirMissilePlayer, 1000) #Tir d'un missile par seconde
+def creerMissilesVaisseau():
+    Missile = pg.USEREVENT + 1 #crée un événement personnalisé avec un identifiant unique
+    pg.time.set_timer(Missile, 1000) #Création d'un missile par seconde
+    return Missile
