@@ -4,7 +4,8 @@ import pygame as pg, sys                # sys = module qui permet d'interagir av
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
 from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau, pv_vaisseau
-from fonctions.ennemis import fillEnemyGroup, directionOfMouvement
+from fonctions.ennemis import fillEnemyGroup, directionOfMouvement, detectCollision
+from fonctions.missiles import creationMissile
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
@@ -19,6 +20,13 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
 pv_joueur = 1                                   # Initialisation des pv (joueur)
+# -------- Optionnel : créer un événement pour tirer automatiquement
+MISSILE_EVENT = pg.USEREVENT + 1        # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
+pg.time.set_timer(MISSILE_EVENT, 1000)  # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement un événement dans la file des événements (pg.event.get()).
+                                        # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
+missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
+missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
+score = 0
 
 ############################## image du background ##################################
 bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()    # chargement d'une image
@@ -42,7 +50,7 @@ eheart = pg.transform.scale(eheart, (50, 50))
 player_laser = pg.image.load("graph/munition50.png").convert_alpha()
 
 ############################## création des ennemis ##################################
-enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)
+enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
 
 # --- Murs ---
 walls = []
@@ -53,20 +61,21 @@ walls = []
 #     pg.Rect(300, 210, 200, 24),
 # ]
 
-missiles = [] #On stocke les missiles
 
-NouvMissile = creerMissilesVaisseau()  #création d'un missile par seconde
 
 ############################## Boucle principale ##################################
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000.0   # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
-    font = pg.font.SysFont("Arial", 24, True) # police pour affichage texte
+    dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
+    font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
+
+    # ------------ Chaque seconde, un missile est créé automatiquement sans appuyer sur une touche.
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
-        elif e.type == NouvMissile:
-            missiles.append(pg.Rect(player.centerx - 5, player.top - 10, 10, 20))
+        elif e.type == MISSILE_EVENT:
+            nouvMissile = creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 2), "vaisseau")
+            missilesVaisseau.add(nouvMissile)
             score += 1
 
     #--- affichages -------------------------------------------------------------
@@ -90,15 +99,18 @@ while running:
     if pg.K_p:
         pv_joueur -= 1
     #A RETIRER TEMPORAIRE POUR TESTS#
+   
+    # -------- création d'un missile quand on appuie sur une touche
+    # TODO : si telle touche est appuyée alors:
+        # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
 
     #--- déplacements ----------------------------------------
     move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
-    directionOfMouvement(enemyGroup, WIDTH, SIZE)
-    enemyGroup.update(ENEMYSTART_X)
-
-    #---?---#
-    missilesPlayer(screen, missiles)
-
+    directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
+    enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
+     
+    # Collision entre un missile et un ennemi
+    # detectCollision(missilesVaisseau, enemyGroup)
 
     # LOGIQUE
     move_and_collide(player, dx, dy, SPEED, dt, walls)
