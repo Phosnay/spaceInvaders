@@ -50,7 +50,7 @@ def directionOfEnemies(enemyGroup, WIDTH, SIZE):
             enemy.rect.y += DOWN
 
 ################ Collision entre un missile et un ennemi ###########################
-def detectCollision(missiles, sprites, score):
+def detectCollision(missiles, sprites, score, SIZE):
     """
     Détecte les collisions entre les missiles et les ennemis.
     Supprime le missile et l'ennemi touchés.
@@ -58,7 +58,7 @@ def detectCollision(missiles, sprites, score):
     collisions = pg.sprite.groupcollide(missiles, sprites, True, False)
     for missile, enemies_hit in collisions.items():
         for enemy in enemies_hit:
-            enemy.takeDamage(1)  # enlève 1 point de vie
+            enemy.takeDamage(1, SIZE)  # enlève 1 point de vie
             if enemy.powerEnemy <= 0:
                 score = score + 1
     return score 

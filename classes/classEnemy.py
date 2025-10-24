@@ -27,8 +27,16 @@ class Enemy(pg.sprite.Sprite):
         """
         self.rect.x += self.speed                           # selon la vitesse (speed) définie automatiquement dans def __init__
 
-    def takeDamage(self, life):
+    def takeDamage(self, life, SIZE):
             """Réduit les points de vie et tue l'ennemi s'ils tombent à 0."""
             self.powerEnemy -= life
+            if self.powerEnemy == 2:
+                enemyMedium_img = pg.image.load("graph/space12.1.png").convert_alpha()
+                enemyMedium_img = pg.transform.scale(enemyMedium_img, (SIZE, SIZE))
+                self.image = enemyMedium_img
+            if self.powerEnemy == 1:
+                enemyWeak_img = pg.image.load("graph/space13.1.png").convert_alpha()
+                enemyWeak_img = pg.transform.scale(enemyWeak_img, (SIZE, SIZE))
+                self.image = enemyWeak_img
             if self.powerEnemy <= 0:
                 self.kill()

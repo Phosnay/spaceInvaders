@@ -122,7 +122,7 @@ while running:
         missilesVaisseau.update()                   # déplacement de tous les missiles
 
         # Collision entre un missile et un ennemi
-        score = detectCollision(missilesVaisseau, enemyGroup, score)
+        score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
 
         # detectCollision(missilesVaisseau, enemyGroup)
 
