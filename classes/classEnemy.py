@@ -26,3 +26,9 @@ class Enemy(pg.sprite.Sprite):
         Applique un déplacement horizontal.
         """
         self.rect.x += self.speed                           # selon la vitesse (speed) définie automatiquement dans def __init__
+
+    def takeDamage(self, life):
+            """Réduit les points de vie et tue l'ennemi s'ils tombent à 0."""
+            self.powerEnemy -= life
+            if self.powerEnemy <= 0:
+                self.kill()

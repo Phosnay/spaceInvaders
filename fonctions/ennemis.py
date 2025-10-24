@@ -55,8 +55,11 @@ def detectCollision(missiles, sprites):
     Détecte les collisions entre les missiles et les ennemis.
     Supprime le missile et l'ennemi touchés.
     """
-    pg.sprite.groupcollide(missiles, sprites, True, True)
-    
+    collisions = pg.sprite.groupcollide(missiles, sprites, True, False)
+    for missile, enemies_hit in collisions.items():
+        for enemy in enemies_hit:
+            enemy.takeDamage(1)  # enlève 1 point de vie
+
 
 # pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)
 # compare tous les sprites des deux groupes.
