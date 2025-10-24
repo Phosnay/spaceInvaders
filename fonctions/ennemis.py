@@ -50,13 +50,25 @@ def directionOfEnemies(enemyGroup, WIDTH, SIZE):
             enemy.rect.y += DOWN
 
 ################ Collision entre un missile et un ennemi ###########################
-def detectCollision(missiles, enemies):
+def detectCollision(missiles, sprites, score, SIZE):
     """
     Détecte les collisions entre les missiles et les ennemis.
     Supprime le missile et l'ennemi touchés.
     """
-    for m in missiles:
-        # Vérifie la collision entre le missile et les ennemis
-        collided = pg.sprite.spritecollide(m, enemies, dokill=True)     # dokill=True → supprime automatiquement les ennemis touchés de enemies pendant l’itération.
-        if collided:                                                    # Si au moins un ennemi est touché
-            missiles.remove(m)                                          # On supprime aussi le missile
+    collisions = pg.sprite.groupcollide(missiles, sprites, True, False)
+    for missile, enemies_hit in collisions.items():
+        for enemy in enemies_hit:
+            enemy.takeDamage(1, SIZE)  # enlève 1 point de vie
+            if enemy.powerEnemy <= 0:
+                score = score + 1
+    return score 
+                
+
+# pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)
+# compare tous les sprites des deux groupes.
+# group1 : missilesVaisseau
+# group2 : enemyGroup
+# dokill1 : si True, supprime le sprite de group1 quand il y a collision (le missile)
+# dokill2 : si True, supprime le sprite de group2 (l’ennemi)
+# retourne un dictionnaire : Chaque clé est un missile ayant touché un ou plusieurs ennemis,
+#                            chaque valeur est une liste des ennemis touchés.

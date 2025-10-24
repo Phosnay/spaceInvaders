@@ -85,7 +85,6 @@ walls = []
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
 
 
-
 ############################## Boucle principale ##################################
 
 running = True
@@ -180,8 +179,11 @@ while running:
         directionOfEnemies(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
         enemyGroup.update()                         # déplacement de tous les ennemis
         missilesVaisseau.update()                   # déplacement de tous les missiles
+
         # Collision entre un missile et un ennemi
-        # detectCollision(missilesVaisseau, enemyGroup)
+        score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
+        # Collision entre un missile et le vaisseau
+        pv_joueur = detectCollision(player, enemyGroup, pv_joueur, SIZE//2)
 
     # LOGIQUE
  
