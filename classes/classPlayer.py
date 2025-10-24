@@ -22,7 +22,7 @@ class Player(pg.sprite.Sprite):
         self.powerPlayer = powerPlayer
         self.speed = speed
 
-    def update(self, WIDTH, HEIGHT):
+    def update(self, screen):
         """ 
         Applique un déplacement selon les touches enfoncées (flèches ou d,q,z,s)
         """
@@ -33,5 +33,8 @@ class Player(pg.sprite.Sprite):
         self.rect.x += self.speed * dx                         # selon la vitesse (speed) définie automatiquement dans def __init__
         self.rect.y += self.speed * dy                         # selon la vitesse (speed) définie automatiquement dans def __init__
 
-        self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.width))
-        self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.height))
+        # empêche le vaisseau de sortir de l'écran
+        # self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.width))
+        # self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.height))
+        screen_rect = screen.get_rect()     # récupère le rectangle de la fenêtre (x=0, y=0, width, height).
+        self.rect.clamp_ip(screen_rect)     # recadre le vaisseau à l’intérieur de cette zone.

@@ -20,7 +20,7 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
-pv_joueur = 3                                  # Initialisation des pv (joueur)
+pv_joueur = 2                                  # Initialisation des pv (joueur)
 menu_state = "main"                             # état du menu (base)
 missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
@@ -172,7 +172,7 @@ while running:
             # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
     if game_paused == False:
         #--- déplacements ----------------------------------------
-        player.update(WIDTH, HEIGHT)                # déplacement du vaisseau
+        player.update(screen)                # déplacement du vaisseau
         missilesVaisseau.update()                   # déplacement de tous les missiles
         enemyGroup.update()                         # déplacement de tous les ennemis
         directionOfEnemies(enemyGroup, WIDTH, SIZE) # direction des déplacements des ennemis
