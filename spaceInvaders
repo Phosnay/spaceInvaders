@@ -1,5 +1,4 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
-import random as rdm
 from pygame import mixer
 from classes.classButton import Button
 from fonctions.vaisseau import  pv_vaisseau
@@ -19,7 +18,7 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
-pv_joueur = 2                                  # Initialisation des pv (joueur)
+pv_joueur = 0                                  # Initialisation des pv (joueur)
 menu_state = "main"                             # état du menu (base)
 missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
@@ -33,7 +32,7 @@ pg.time.set_timer(MISSILE_EVENT, 1000)  # pg.time.set_timer : fonction de Pygame
 ################# initialisation des sons Pygame ######################
 mixer.init()
 mixer.music.load("sounds/player_shoot.wav")
-optionVolume = 0.5                           # volume entre 0.0 et 1.0
+optionVolume = 0.5                      # volume entre 0.0 et 1.0
 mixer.music.set_volume(optionVolume)
 
 ############################## image du background ##################################
@@ -78,78 +77,72 @@ back_button = Button(350, 500, back_img, 1)
 plus_button = Button(500, 400, plus_img, 1)
 minus_button = Button(300, 400, minus_img, 1)
 
-
-
 # --- Murs ---
 walls = []
 
-
 ############################## création des ennemis ##################################
-enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
-
+enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE) # liste contenant tous les ennemis 
 
 ############################## Boucle principale ##################################
-
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
     font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
 
     for e in pg.event.get():
-        if e.type == pg.QUIT: # On verifie si on quitte le jeu
+        if e.type == pg.QUIT:                   # On verifie si on quitte le jeu
             running = False
 
         if game_paused == False:
-            if e.type == MISSILE_EVENT:    # Partie de la boucle creation des missiles
+            if e.type == MISSILE_EVENT:         # Partie de la boucle creation des missiles
                 nouvMissile = creationMissile((player.rect.centerx - 4), (player.rect.top - 10), 1, SIZE, "vaisseau") # Creation d'un missile au dessus du joueur
                 missilesVaisseau.add(nouvMissile) # Ajout missile dans grp missile
                 mixer.music.play()
-                score += 1 # +1 score par tir (donc toute les sec)
+                score += 1                      # +1 score par tir (donc toute les sec)
             if e.type == pg.KEYDOWN:
-                if e.key == pg.K_SPACE: # On verifie que la touche "espace" est appuyée pour pauser le jeu
+                if e.key == pg.K_SPACE:         # On verifie que la touche "espace" est appuyée pour pauser le jeu
                     game_paused = True
     
     #--- affichages -------------------------------------------------------------
-    screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
-    enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
-    playerGroup.draw(screen)                         # affiche le vaisseau
-    missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
+    screen.blit(bg_img, (0, 0))     # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
+    enemyGroup.draw(screen)         # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
+    playerGroup.draw(screen)        # affiche le vaisseau
+    missilesVaisseau.draw(screen)   # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
     textScore = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
     textPause = font.render("\"ESPACE\" pour mettre pause", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
     textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
-    screen.blit(textScore, (650, 10))                # affiche le score en haut à droite
-    screen.blit(textPause, (250, 10))               # affiche "PAUSE" en bas à gauche
-
-    pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
+    screen.blit(textScore, (650, 10))                               # affiche le score en haut à droite
+    screen.blit(textPause, (250, 10))                               # affiche "PAUSE" en bas à gauche
+    pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img)    # affiche les pv du vaisseau
    
     if game_paused == True:
         overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA) # Crée une surface transparente
         overlay.fill((0, 0, 0, 160)) 
         screen.blit(overlay, (0, 0))
 
-        if menu_state == "main": # Verification de si menu principal est actif
-            if resume_button.draw(screen): # Bouton reprendre le jeu
+        if menu_state == "main":                # Verification de si menu principal est actif
+            if resume_button.draw(screen):      # Bouton reprendre le jeu
                 game_paused = False
-            elif options_button.draw(screen): # Bouton option 
-                menu_state = "options"      # change au menu "option"
-            elif quit_button.draw(screen):    # Bouton qui permet de quitter le jeu
-                running = False             # On arrete la boucle principale
+            elif options_button.draw(screen):   # Bouton option 
+                menu_state = "options"          # change au menu "option"
+            elif quit_button.draw(screen):      # Bouton qui permet de quitter le jeu
+                running = False                 # On arrete la boucle principale
 
-        if menu_state == "options": # Verification de si option à été cliqué
+        if menu_state == "options":             # Verification de si option à été cliqué
             if video_button.draw(screen):
-                menu_state = "video"                   # Pass = Placeholder
+                menu_state = "video"            # Pass = Placeholder
             elif audio_button.draw(screen):
-                menu_state = "audio"    # change au menu "audio"
+                menu_state = "audio"            # change au menu "audio"
             elif keys_button.draw(screen):
                 menu_state = "keys"
             elif back_button.draw(screen):
                 menu_state = "main"
 
-        if menu_state == "video": # Verification de si video à été cliqué
+        if menu_state == "video":               # Verification de si video à été cliqué
             if back_button.draw(screen):
                 menu_state = "options"
 
-        elif menu_state == "audio": # Verification de si audio à été cliqué
+        elif menu_state == "audio":             # Verification de si audio à été cliqué
             screen.blit(textVolume, (350, 200))
             if minus_button.draw(screen):
                 optionVolume -= 0.1
@@ -163,23 +156,28 @@ while running:
                 mixer.music.set_volume(optionVolume)
             if back_button.draw(screen):
                 menu_state = "options"
-        elif menu_state == "keys": # Verification de si audio à été cliqué
+        elif menu_state == "keys":              # Verification de si audio à été cliqué
             if back_button.draw(screen):
                 menu_state = "options"
         # -------- création d'un missile quand on appuie sur une touche
         # TODO : si telle touche est appuyée alors:
             # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
     if game_paused == False:
+
+
         #--- déplacements ----------------------------------------
-        player.update(screen)                # déplacement du vaisseau
-        missilesVaisseau.update()                   # déplacement de tous les missiles
+        player.update(screen)                       # déplacement du vaisseau
+        missilesVaisseau.update()                   # déplacement de tous les missiles du vaisseau
         enemyGroup.update()                         # déplacement de tous les ennemis
         directionOfEnemies(enemyGroup, WIDTH, SIZE) # direction des déplacements des ennemis
+        # TODO : déplacement de tous les missiles des ennemis
 
-        # Collision entre un missile et un ennemi
+        # Collision entre les  missiles du vaisseau et des ennemis
         score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
-        # Collision entre un missile et le vaisseau
+        # Collision entre le vaisseau et les ennemis
         pv_joueur = detectCollision(playerGroup, enemyGroup, pv_joueur, SIZE//2)
+        # TODO : Collision entre les missiles des ennemis et le vaisseau
+
 
     # LOGIQUE
     for w in walls:
