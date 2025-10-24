@@ -22,7 +22,7 @@ def creationMissile(x, y, POWER, SIZE, wich):
     else:
         raise ValueError("Type de missile inconnu : doit être 'vaisseau' ou 'enemy'")
     # redimensionnement de l'image en entier
-    missile_img = pg.transform.scale(missile_img, (int(SIZE/4.5), int(SIZE/4.5)))         # taille de l'image imposée
+    missile_img = pg.transform.scale(missile_img, (int(SIZE/4), int(SIZE/4)))         # taille de l'image imposée
 
     # instancier le missile
     missile = Missile(x, y, missile_img, direction, POWER)
