@@ -20,9 +20,10 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
 pv_joueur = 1                                   # Initialisation des pv (joueur)
-missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
-missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
+missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
+missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
 # -------- Optionnel : créer un événement pour tirer automatiquement
+# ------------ Chaque seconde, un évènement est créé dans pg.event.get()
 MISSILE_EVENT = pg.USEREVENT + 1        # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
 pg.time.set_timer(MISSILE_EVENT, 1000)  # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement un événement dans la file des événements (pg.event.get()).
                                         # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
@@ -45,20 +46,12 @@ fheart = pg.transform.scale(fheart, (50, 50))
 eheart = pg.image.load("graph/emptyheart.png").convert_alpha()
 eheart = pg.transform.scale(eheart, (50, 50))
 
-############################## laser du vaisseau ##################################
-player_laser = pg.image.load("graph/munition50.png").convert_alpha()
+# --- Murs ---
+walls = []
+
 
 ############################## création des ennemis ##################################
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
-
-# --- Murs ---
-walls = []
-#     pg.Rect(150, 80, 500, 24),
-#     pg.Rect(150, 380, 500, 24),
-#     pg.Rect(150, 80, 24, 324),
-#     pg.Rect(626, 80, 24, 324),
-#     pg.Rect(300, 210, 200, 24),
-# ]
 
 
 
@@ -68,12 +61,11 @@ while running:
     dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
     font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
 
-    # ------------ Chaque seconde, un missile est créé automatiquement sans appuyer sur une touche.
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
         elif e.type == MISSILE_EVENT:
-            nouvMissile = creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 2), "vaisseau")
+            nouvMissile = creationMissile((player.centerx - 4), (player.top - 10), 1, SIZE, "vaisseau")
             missilesVaisseau.add(nouvMissile)
             score += 1
 
@@ -85,8 +77,8 @@ while running:
                                                                     # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
     text = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
-    screen.blit(text, (650, 10))                 # affiche le score en haut à droite
-    missilesVaisseau.draw(screen)                     # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
+    screen.blit(text, (650, 10))                # affiche le score en haut à droite
+    missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
 
     pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
     #--- détections des touches du clavier ----------------------------------------
@@ -134,3 +126,17 @@ pg.quit(); sys.exit()
 #     bg_y = 0                                    # y repart à 0 : boucle infinie
 # screen.blit(bg_img, (0, bg_y))                  # colle l'image sur la fenêtre graphique aux coordonées (x,y)        
 # screen.blit(bg_img, (0, bg_y - bg_height))      # colle l'image juste au-dessous de la première
+
+
+# --- Murs ---
+# walls = []
+#     pg.Rect(150, 80, 500, 24),
+#     pg.Rect(150, 380, 500, 24),
+#     pg.Rect(150, 80, 24, 324),
+#     pg.Rect(626, 80, 24, 324),
+#     pg.Rect(300, 210, 200, 24),
+# ]
+
+
+############################## laser du vaisseau ##################################
+# player_laser = pg.image.load("graph/munition50.png").convert_alpha()
