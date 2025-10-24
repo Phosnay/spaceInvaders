@@ -1,5 +1,3 @@
-"""Nils : Finir refactoring missile, affichage des infos/barres infos, affichage menus"""
-
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
