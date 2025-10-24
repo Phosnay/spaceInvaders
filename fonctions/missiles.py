@@ -6,10 +6,10 @@ from classes.classMissile import Missile
 def creationMissile(x, y, POWER, SIZE, wich):
     """
     Crée un groupe contenant un missile.
-    x, y : position de départ
-    POWER : puissance du missile
-    SIZE : taille de référence pour l'image
-    wich : "vaisseau" ou "enemy"
+    (x, y : position de départ), 
+    (POWER : puissance du missile), 
+    (SIZE : taille de référence pour l'image), 
+    (wich : "vaisseau" ou "enemy")
     """
     
     # chargement de l'image 
@@ -20,7 +20,7 @@ def creationMissile(x, y, POWER, SIZE, wich):
     else:
         raise ValueError("Type de missile inconnu : doit être 'vaisseau' ou 'enemy'")
     # redimensionnement de l'image en entier
-    missile_img = pg.transform.scale(missile_img, (int(SIZE / 10), int(SIZE / 10)))         # taille de l'image imposée
+    missile_img = pg.transform.scale(missile_img, (int(SIZE/4.5), int(SIZE/1.7)))         # taille de l'image imposée
 
     # instancier le missile
     missile = Missile(x, y, missile_img, POWER)
