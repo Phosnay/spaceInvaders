@@ -10,11 +10,11 @@ from fonctions.missiles import creationMissile
 
 
 ################# variables constantes #####################
-WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
+WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables: largeur et hauteur de l'écran, FPS: Frames Per Second
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
-SIZE, SPEED = 36, 220                   # affectation multiple pour 2 variables
+SIZE, SPEED = 36, 220                   # taille des images, vitesse
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
-ENEMYSPACE_X= 10                                # espacement entre les rangés
+ENEMYSPACE_X= 10                        # espacement entre les rangés des ennemis
 ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
 
 ################# initialisation des modules Pygame ######################
@@ -123,8 +123,8 @@ while running:
         #--- déplacements ----------------------------------------
         move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
         directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
-        enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
-        
+        enemyGroup.update()                         # déplacement de tous les ennemis
+        missilesVaisseau.update()                   # déplacement de tous les missiles
         # Collision entre un missile et un ennemi
         # detectCollision(missilesVaisseau, enemyGroup)
 
