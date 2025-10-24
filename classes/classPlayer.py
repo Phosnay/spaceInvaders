@@ -25,16 +25,19 @@ class Player(pg.sprite.Sprite):
     def update(self, screen):
         """ 
         Applique un déplacement selon les touches enfoncées (flèches ou d,q,z,s)
+        Oblige le vaisseau à rester dans l'écran (screen)
         """
         k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
         dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
         dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
 
-        self.rect.x += self.speed * dx                         # selon la vitesse (speed) définie automatiquement dans def __init__
-        self.rect.y += self.speed * dy                         # selon la vitesse (speed) définie automatiquement dans def __init__
+        self.rect.x += self.speed * dx   # selon la vitesse (speed) définie automatiquement dans def __init__
+        self.rect.y += self.speed * dy   # selon la vitesse (speed) définie automatiquement dans def __init__
 
-        # empêche le vaisseau de sortir de l'écran
+        # empêche le vaisseau de sortir de l'écran ancienne version avec WIDTH et HEIGHT en variables
         # self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.width))
         # self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.height))
+
+        # empêche le vaisseau de sortir de l'écran avec clamp
         screen_rect = screen.get_rect()     # récupère le rectangle de la fenêtre (x=0, y=0, width, height).
         self.rect.clamp_ip(screen_rect)     # recadre le vaisseau à l’intérieur de cette zone.
