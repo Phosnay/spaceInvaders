@@ -3,9 +3,12 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
+from classes.classButton import Button
 from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau, pv_vaisseau
 from fonctions.ennemis import fillEnemyGroup, directionOfMouvement, detectCollision
 from fonctions.missiles import creationMissile
+
+
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables (Frames Per Second)
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
@@ -22,6 +25,7 @@ score = 0                                       # initialisation du score
 pv_joueur = 1                                   # Initialisation des pv (joueur)
 missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
+game_paused = False                             # Pour pauser le jeu (ici false = pas de pause)
 # -------- Optionnel : créer un événement pour tirer automatiquement
 # ------------ Chaque seconde, un évènement est créé dans pg.event.get()
 MISSILE_EVENT = pg.USEREVENT + 1        # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
@@ -35,7 +39,6 @@ bg_height = bg_img.get_height()                         # récupère la hauteur 
 bg_y = 0
 gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
 gameover_img = pg.transform.scale(gameover_img, (WIDTH, HEIGHT))
-
 ############################## image du vaisseau ##################################
 player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)     # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
 player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
@@ -45,6 +48,14 @@ fheart = pg.image.load("graph/fullheart.png").convert_alpha()
 fheart = pg.transform.scale(fheart, (50, 50))
 eheart = pg.image.load("graph/emptyheart.png").convert_alpha()
 eheart = pg.transform.scale(eheart, (50, 50))
+############################## Images Menu ##################################
+resume_img = pg.image.load("graph/button_resume.png").convert_alpha()
+options_img = pg.image.load("graph/button_options.png").convert_alpha()
+quit_img = pg.image.load("graph/button_quit.png").convert_alpha()
+resume_button = Button(304, 125, resume_img, 1)
+options_button = Button(297, 250, options_img, 1)
+quit_button = Button(336, 375, quit_img, 1)
+
 
 # --- Murs ---
 walls = []
@@ -56,19 +67,25 @@ enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les e
 
 
 ############################## Boucle principale ##################################
+
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
     font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
 
     for e in pg.event.get():
-        if e.type == pg.QUIT:
+        if e.type == pg.QUIT: # On verifie si on quitte le jeu
             running = False
-        elif e.type == MISSILE_EVENT:
-            nouvMissile = creationMissile((player.centerx - 4), (player.top - 10), 1, SIZE, "vaisseau")
-            missilesVaisseau.add(nouvMissile)
-            score += 1
 
+        if game_paused == False:
+            if e.type == MISSILE_EVENT:    # Partie de la boucle creation des missiles
+                nouvMissile = creationMissile((player.centerx - 4), (player.top - 10), 1, SIZE, "vaisseau") # Creation d'un missile au dessus du joueur
+                missilesVaisseau.add(nouvMissile) # Ajout missile dans grp missile
+                score += 1 # +1 score par tir (donc toute les sec)
+            if e.type == pg.KEYDOWN:
+                if e.key == pg.K_SPACE: # On verifie que la touche "espace" est appuyée pour pauser le jeu
+                    game_paused = True
+    
     #--- affichages -------------------------------------------------------------
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
     enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
@@ -76,8 +93,10 @@ while running:
                                                                     # for w in walls:
                                                                     # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
-    text = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
-    screen.blit(text, (650, 10))                # affiche le score en haut à droite
+    textScore = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
+    textPause = font.render("\"ESPACE\" pour pauser", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
+    screen.blit(textScore, (650, 10))                # affiche le score en haut à droite
+    screen.blit(textPause, (270, 10))               # affiche "PAUSE" en bas à gauche
     missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
 
     pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
@@ -85,35 +104,39 @@ while running:
     k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
     dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
     dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
-    
-    #A RETIRER TEMPORAIRE POUR TESTS#
-    if pg.K_o:
-        pv_joueur += 1
-    if pg.K_p:
-        pv_joueur -= 1
-    #A RETIRER TEMPORAIRE POUR TESTS#
    
-    # -------- création d'un missile quand on appuie sur une touche
-    # TODO : si telle touche est appuyée alors:
-        # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
+    if game_paused == True:
+        overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA) # Crée une surface transparente
+        overlay.fill((0, 0, 0, 160)) 
+        screen.blit(overlay, (0, 0))
 
-    #--- déplacements ----------------------------------------
-    move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
-    directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
-    enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
-     
-    # Collision entre un missile et un ennemi
-    # detectCollision(missilesVaisseau, enemyGroup)
+        if resume_button.draw(screen): # Bouton reprendre le jeu
+            game_paused = False
+        if options_button.draw(screen): # Bouton option (non fonctionnel pour l'instant)
+            pass
+        if quit_button.draw(screen):    # Bouton qui permet de quitter le jeu
+            running = False
+        # -------- création d'un missile quand on appuie sur une touche
+        # TODO : si telle touche est appuyée alors:
+            # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
+    if game_paused == False:
+        #--- déplacements ----------------------------------------
+        move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
+        directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
+        enemyGroup.update(ENEMYSTART_X)                         # déplacement groupé des ennemis
+        
+        # Collision entre un missile et un ennemi
+        # detectCollision(missilesVaisseau, enemyGroup)
 
-    # LOGIQUE
-    move_and_collide(player, dx, dy, SPEED, dt, walls)
-    clamp(WIDTH, HEIGHT, player)
+        # LOGIQUE
+        move_and_collide(player, dx, dy, SPEED, dt, walls)
+        clamp(WIDTH, HEIGHT, player)
 
-    for w in walls:
-        pg.draw.rect(screen, WCOLOR, w)
-    screen.blit(player_img, player.topleft) 
-    pg.display.flip()
+        for w in walls:
+            pg.draw.rect(screen, WCOLOR, w)
+        pg.display.flip()
 
+    pg.display.update()
 pg.quit(); sys.exit()
 
 
