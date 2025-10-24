@@ -5,10 +5,8 @@ import random as rdm
 from classes.classBlock import Block            # ou import classBlock 
 from classes.classButton import Button
 from fonctions.vaisseau import clamp, move_and_collide, missilesPlayer, creerMissilesVaisseau, pv_vaisseau
-from fonctions.ennemis import fillEnemyGroup, directionOfMouvement, detectCollision
-from fonctions.missiles import creationMissile
-
-
+from fonctions.ennemis import fillEnemyGroup, directionOfEnemies, detectCollision
+from fonctions.missiles import creationMissile, missileKill
 ################# variables constantes #####################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables: largeur et hauteur de l'écran, FPS: Frames Per Second
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
@@ -122,22 +120,22 @@ while running:
     if game_paused == False:
         #--- déplacements ----------------------------------------
         move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
-        directionOfMouvement(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
+        directionOfEnemies(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
         enemyGroup.update()                         # déplacement de tous les ennemis
         missilesVaisseau.update()                   # déplacement de tous les missiles
         # Collision entre un missile et un ennemi
         # detectCollision(missilesVaisseau, enemyGroup)
 
-        # LOGIQUE
-        move_and_collide(player, dx, dy, SPEED, dt, walls)
-        clamp(WIDTH, HEIGHT, player)
+    # LOGIQUE
+ 
+    clamp(WIDTH, HEIGHT, player)
 
-        for w in walls:
-            pg.draw.rect(screen, WCOLOR, w)
-        pg.display.flip()
+    for w in walls:
+        pg.draw.rect(screen, WCOLOR, w)
+    pg.display.flip()
 
     pg.display.update()
-pg.quit(); sys.exit()
+    pg.quit(); sys.exit()
 
 
 
@@ -161,5 +159,3 @@ pg.quit(); sys.exit()
 # ]
 
 
-############################## laser du vaisseau ##################################
-# player_laser = pg.image.load("graph/munition50.png").convert_alpha()

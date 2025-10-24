@@ -34,7 +34,7 @@ def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
     return enemyGroup
 
 ################ changement de direction des ennemis ##########################
-def directionOfMouvement(enemyGroup, WIDTH, SIZE):
+def directionOfEnemies(enemyGroup, WIDTH, SIZE):
     """
     Dès qu'un ennemi touche les bords, tous les ennemis partent en sens inverse.
     (ennemyGroup: collection des ennemis), 
