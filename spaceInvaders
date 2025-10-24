@@ -3,7 +3,7 @@ import random as rdm
 from pygame import mixer
 from classes.classBlock import Block            # ou import classBlock 
 from classes.classButton import Button
-from fonctions.vaisseau import move_and_collide, missilesPlayer, pv_vaisseau
+from fonctions.vaisseau import  pv_vaisseau
 from fonctions.ennemis import fillEnemyGroup, directionOfEnemies, detectCollision
 from fonctions.missiles import creationMissile
 from classes.classPlayer import Player
@@ -20,7 +20,7 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
-pv_joueur = 1                                   # Initialisation des pv (joueur)
+pv_joueur = 3                                  # Initialisation des pv (joueur)
 menu_state = "main"                             # état du menu (base)
 missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
@@ -45,7 +45,6 @@ bg_y = 0
 gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
 gameover_img = pg.transform.scale(gameover_img, (WIDTH, HEIGHT))
 ############################## image du vaisseau ##################################
-#player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE)     # rectangle (x, y, largeur, hauteur) au centre de la fenêtre
 player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
 player_img = pg.transform.scale(player_img, (SIZE, SIZE))
 image = player_img
@@ -114,22 +113,15 @@ while running:
     #--- affichages -------------------------------------------------------------
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
     enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
-    # clamp(WIDTH, HEIGHT, player)                # pose des limites pour rester dans la fenêtre 
-                                                                    # for w in walls:
-                                                                    # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     playerGroup.draw(screen)                         # affiche le vaisseau
+    missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
     textScore = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
     textPause = font.render("\"ESPACE\" pour mettre pause", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
     textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
     screen.blit(textScore, (650, 10))                # affiche le score en haut à droite
     screen.blit(textPause, (250, 10))               # affiche "PAUSE" en bas à gauche
-    missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
 
     pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
-    #--- détections des touches du clavier ----------------------------------------
-    # k = pg.key.get_pressed()                                            # retourne l'état actuel de toutes les touches du clavier
-    # dx = (k[pg.K_RIGHT] or k[pg.K_d]) - (k[pg.K_LEFT] or k[pg.K_q])     # k[pg.K_RIGHT] == 1 si la touche flèche droite est enfoncée sinon vaut 0
-    # dy = (k[pg.K_DOWN]  or k[pg.K_s]) - (k[pg.K_UP]   or k[pg.K_z])     # dy vaut +1 vers le bas, -1 vers le haut, 0 sinon
    
     if game_paused == True:
         overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA) # Crée une surface transparente
@@ -180,11 +172,10 @@ while running:
             # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
     if game_paused == False:
         #--- déplacements ----------------------------------------
-        #move_and_collide(player, dx, dy, SPEED, dt, walls)      # déplacement du vaisseau
-        player.update(WIDTH, HEIGHT)
-        directionOfEnemies(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
-        enemyGroup.update()                         # déplacement de tous les ennemis
+        player.update(WIDTH, HEIGHT)                # déplacement du vaisseau
         missilesVaisseau.update()                   # déplacement de tous les missiles
+        enemyGroup.update()                         # déplacement de tous les ennemis
+        directionOfEnemies(enemyGroup, WIDTH, SIZE) # direction des déplacements des ennemis
 
         # Collision entre un missile et un ennemi
         score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
@@ -192,9 +183,6 @@ while running:
         pv_joueur = detectCollision(playerGroup, enemyGroup, pv_joueur, SIZE//2)
 
     # LOGIQUE
- 
-    # clamp(WIDTH, HEIGHT, player)
-
     for w in walls:
         pg.draw.rect(screen, WCOLOR, w)
     pg.display.flip()
