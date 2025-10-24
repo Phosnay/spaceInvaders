@@ -1,7 +1,6 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import random as rdm
 from pygame import mixer
-from classes.classBlock import Block            # ou import classBlock 
 from classes.classButton import Button
 from fonctions.vaisseau import  pv_vaisseau
 from fonctions.ennemis import fillEnemyGroup, directionOfEnemies, detectCollision
@@ -202,13 +201,5 @@ pg.quit(); sys.exit()
 # screen.blit(bg_img, (0, bg_y - bg_height))      # colle l'image juste au-dessous de la première
 
 
-# --- Murs ---
-# walls = []
-#     pg.Rect(150, 80, 500, 24),
-#     pg.Rect(150, 380, 500, 24),
-#     pg.Rect(150, 80, 24, 324),
-#     pg.Rect(626, 80, 24, 324),
-#     pg.Rect(300, 210, 200, 24),
-# ]
 
 
