@@ -114,7 +114,7 @@ while running:
     #--- affichages -------------------------------------------------------------
     screen.blit(bg_img, (0, 0))                 # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
     enemyGroup.draw(screen)                     # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
-    # clamp(WIDTH, HEIGHT, player)                # pose des limites pour rester dans la fenêtre
+    # clamp(WIDTH, HEIGHT, player)                # pose des limites pour rester dans la fenêtre 
                                                                     # for w in walls:
                                                                     # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     playerGroup.draw(screen)                         # affiche le vaisseau
