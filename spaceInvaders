@@ -61,7 +61,6 @@ walls = []
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE)     # liste contenant tous les ennemis 
 
 
-
 ############################## Boucle principale ##################################
 
 running = True
@@ -123,8 +122,8 @@ while running:
 
         # Collision entre un missile et un ennemi
         score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
-
-        # detectCollision(missilesVaisseau, enemyGroup)
+        # Collision entre un missile et le vaisseau
+        pv_joueur = detectCollision(player, enemyGroup, pv_joueur, SIZE//2)
 
     # LOGIQUE
  
