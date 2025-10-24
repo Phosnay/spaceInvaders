@@ -121,7 +121,10 @@ while running:
         directionOfEnemies(enemyGroup, WIDTH, SIZE)           # direction des déplacements des ennemis
         enemyGroup.update()                         # déplacement de tous les ennemis
         missilesVaisseau.update()                   # déplacement de tous les missiles
+
         # Collision entre un missile et un ennemi
+        detectCollision(missilesVaisseau, enemyGroup)
+
         # detectCollision(missilesVaisseau, enemyGroup)
 
     # LOGIQUE
