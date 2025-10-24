@@ -90,9 +90,9 @@ while running:
                                                                     # pg.draw.rect(screen, WCOLOR, w)         # affiche les murs (pas de murs pour l'instant)
     screen.blit(player_img, player.topleft)     # affiche le vaisseau
     textScore = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
-    textPause = font.render("\"ESPACE\" pour pauser", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
+    textPause = font.render("\"ESPACE\" pour mettre pause", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
     screen.blit(textScore, (650, 10))                # affiche le score en haut à droite
-    screen.blit(textPause, (270, 10))               # affiche "PAUSE" en bas à gauche
+    screen.blit(textPause, (250, 10))               # affiche "PAUSE" en bas à gauche
     missilesVaisseau.draw(screen)               # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
 
     pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img) # affiche les pv du vaisseau
