@@ -1,9 +1,9 @@
 import pygame as pg, sys                # sys = module qui permet d'interagir avec Python (sys.exit())
 import time
 
-def clamp(WIDTH, HEIGHT, r):
-    r.left = max(0, r.left); r.top = max(0, r.top)
-    r.right = min(WIDTH, r.right); r.bottom = min(HEIGHT, r.bottom)
+# def clamp(WIDTH, HEIGHT, r):
+#     r.left = max(0, r.left); r.top = max(0, r.top)
+#     r.right = min(WIDTH, r.right); r.bottom = min(HEIGHT, r.bottom)
 
 # r = player = pg.Rect(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, SIZE, SIZE) 
 # dx = vaut +1 vers la droite, -1 vers la gauche, 0 sinon
