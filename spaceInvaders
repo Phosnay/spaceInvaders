@@ -18,7 +18,7 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                         # time.Clock=horloge interne
 score = 0                                       # initialisation du score
-pv_joueur = 1                                   # Initialisation des pv (joueur)
+pv_joueur = 3                                   # Initialisation des pv (joueur)
 missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
 game_paused = False                             # Pour pauser le jeu (ici false = pas de pause)
@@ -77,7 +77,6 @@ while running:
             if e.type == MISSILE_EVENT:    # Partie de la boucle creation des missiles
                 nouvMissile = creationMissile((player.centerx - 4), (player.top - 10), 1, SIZE, "vaisseau") # Creation d'un missile au dessus du joueur
                 missilesVaisseau.add(nouvMissile) # Ajout missile dans grp missile
-                score += 1 # +1 score par tir (donc toute les sec)
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_SPACE: # On verifie que la touche "espace" est appuyée pour pauser le jeu
                     game_paused = True
@@ -123,7 +122,7 @@ while running:
         missilesVaisseau.update()                   # déplacement de tous les missiles
 
         # Collision entre un missile et un ennemi
-        detectCollision(missilesVaisseau, enemyGroup)
+        score = detectCollision(missilesVaisseau, enemyGroup, score)
 
         # detectCollision(missilesVaisseau, enemyGroup)
 

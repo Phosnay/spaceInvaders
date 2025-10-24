@@ -50,7 +50,7 @@ def directionOfEnemies(enemyGroup, WIDTH, SIZE):
             enemy.rect.y += DOWN
 
 ################ Collision entre un missile et un ennemi ###########################
-def detectCollision(missiles, sprites):
+def detectCollision(missiles, sprites, score):
     """
     Détecte les collisions entre les missiles et les ennemis.
     Supprime le missile et l'ennemi touchés.
@@ -59,7 +59,10 @@ def detectCollision(missiles, sprites):
     for missile, enemies_hit in collisions.items():
         for enemy in enemies_hit:
             enemy.takeDamage(1)  # enlève 1 point de vie
-
+            if enemy.powerEnemy <= 0:
+                score = score + 1
+    return score 
+                
 
 # pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)
 # compare tous les sprites des deux groupes.
