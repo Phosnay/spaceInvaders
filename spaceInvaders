@@ -135,7 +135,7 @@ while running:
     pg.display.flip()
 
     pg.display.update()
-    pg.quit(); sys.exit()
+pg.quit(); sys.exit()
 
 
 
