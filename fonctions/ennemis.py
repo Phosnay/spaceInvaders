@@ -33,8 +33,13 @@ def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
             enemyGroup.add(e)
     return enemyGroup
 
-################ déplacement des ennemis ##########################
+################ changement de direction des ennemis ##########################
 def directionOfMouvement(enemyGroup, WIDTH, SIZE):
+    """
+    Dès qu'un ennemi touche les bords, tous les ennemis partent en sens inverse.
+    (ennemyGroup: collection des ennemis), 
+    (WIDTH: largeur de l'écran), 
+    (SIZE: taille de l'image)"""
     inScreen = True
     for enemy in enemyGroup:
         if enemy.rect.x + SIZE >= WIDTH or enemy.rect.x < 0:        # si un seul vaisseau touche le bord
