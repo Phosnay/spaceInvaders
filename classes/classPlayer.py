@@ -68,9 +68,9 @@ class Player(pg.sprite.Sprite):
             screen.blit(eheart, (40,10))
             screen.blit(eheart, (70,10))
         elif self.power <= 0:
-            gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
-            gameover_img = pg.transform.scale(gameover_img, screen.get_size())
             screen.blit(eheart, (10,10))
             screen.blit(eheart, (40,10))
             screen.blit(eheart, (70,10))
+            gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
+            gameover_img = pg.transform.scale(gameover_img, screen.get_size())
             screen.blit(gameover_img, (0,0))

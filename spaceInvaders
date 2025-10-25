@@ -7,53 +7,55 @@ from fonctions.missiles import creationMissile
 
 pg.init()   # sert à initialiser tous les modules de Pygame (display, time, surface, mixer (mais peut échouer silencieusement), event, key, mouse, font, )
 
-################# initialisation des sons Pygame ######################
+################# Initialisation des sons Pygame ######################
 # ----- pas besoin de mettre pg. devant chaque mixer car mixer a été importé de pygame
 mixer.init(frequency=44100, size=-16, channels=2, buffer=512)   # Forçage de l’initialisation du module audio, avec réglages précis pour être sûr que le module audio marche
 # mixer.music.load("sounds/player_shoot.wav")                   # lit directement depuis le fichier (ne charge pas tout en mémoire) une seule musique peut être jouée à la fois : musique longue
 sound_shooting = mixer.Sound("sounds/player_shoot.wav")         # les fichiers sont chargés entièrement en mémoire et on peut en jouer plusieurs simultanément : bruitage court
-optionVolume = 0.5                      # volume entre 0.0 et 1.0
-mixer.music.set_volume(optionVolume)
+optionVolume = 0.4                                              # 40% du volume 
+sound_shooting.set_volume(optionVolume)                         # volume entre 0.0 et 1.0
 
-################# variables constantes #####################
+################# Constantes #########################################
 WIDTH, HEIGHT, FPS = 800, 800, 60       # affectation multiple pour 3 variables: largeur et hauteur de l'écran, FPS: Frames Per Second
 BG = (24,26,32); WCOLOR = (200,80,80)   # le point virgule permet de mettre 2 instructions sur 1 ligne, 2 variables tuple RGB
 SIZE, SPEED = 36, 220                   # taille des images, vitesse
 SCROLL_SPEED = 60                       # vitesse du scroll (qtt de pixels par seconde)
-ENEMYSPACE_X= 10                        # espacement entre les rangés des ennemis
+ENEMYSPACE_X = 10                       # espacement entre les rangés des ennemis
 ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionnement du premier ennemi pour que la ligne soit centrée
 
-################# variables ######################
-screen = pg.display.set_mode((WIDTH, HEIGHT))   # display=gère l'affichage, set_mode=une fenêtre graphique
-clock = pg.time.Clock()                         # time.Clock=horloge interne
-MISSILE_EVENT = pg.USEREVENT + 1                # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
-pg.time.set_timer(MISSILE_EVENT, 1000)          # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement (1000=toutes les secondes) un événement dans la file des événements (pg.event.get()).
+################# Variables ####################################################
+screen = pg.display.set_mode((WIDTH, HEIGHT))           # display=gère l'affichage, set_mode=une fenêtre graphique
+clock = pg.time.Clock()                                 # time.Clock=horloge interne
+font = pg.font.SysFont("Arial", 24, True)               # police pour affichage texte
+overlay = pg.Surface(screen.get_size(), pg.SRCALPHA)    # Crée une surface transparente. remplacé (WIDTH, HEIGHT) par screen.get_size()
 
-missilesVaisseau = pg.sprite.Group()            # stockage des missiles du vaisseau
-missilesEnemies = pg.sprite.Group()             # stockage des missiles des ennemis
-playerGroup = pg.sprite.GroupSingle()           # stockage du vaisseau
+missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
+missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
+playerGroup = pg.sprite.GroupSingle()   # stockage du vaisseau
 
-score = 0                                       # initialisation du score
-pv_joueur = 3                                   # Initialisation des pv (joueur)
-menu_state = "main"                             # état du menu (base)
-game_paused = False                             # Pour pauser le jeu (ici false = pas de pause)
-                                        # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
+score = 0            # initialisation du score
+pv_joueur = 3        # Initialisation des pv (joueur)
+menu_state = "main"  # état du menu (base)
+game_paused = False  # Pour pauser le jeu (ici false = pas de pause)
 
-############################## image du background ##################################
-bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()    # chargement d'une image
-bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))    # impose une taille à l'image, celle de la fenêtre
-bg_height = bg_img.get_height()                         # récupère la hauteur originale de l'image en pixels
+textScore = font.render(f"Score : {score}", True, (255, 255, 255))                          # crée une surface "texte" pour le score
+textPause = font.render("\"ESPACE\"  : mettre en pause", True, (255, 255, 255))             # crée une surface "texte" pour indiquer comment mettre en pause, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
+textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
+
+############################## Création du background #############################
+bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()   # chargement d'une image
+bg_img = pg.transform.scale(bg_img, (WIDTH, HEIGHT))                # impose une taille à l'image, celle de la fenêtre
+bg_height = bg_img.get_height()                                     # récupère la hauteur originale de l'image en pixels
 bg_y = 0
-gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
-gameover_img = pg.transform.scale(gameover_img, (WIDTH, HEIGHT))
-############################## image du vaisseau ##################################
+
+############################## Création du vaisseau ###############################
 player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
 player_img = pg.transform.scale(player_img, (SIZE, SIZE))
 image = player_img
 player = Player(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, image, pv_joueur)
-playerGroup = pg.sprite.GroupSingle(player)
+playerGroup.add(player)
 
-############################## Images Menu ##################################
+############################## Création du menu ##################################
 resume_img = pg.image.load("graph/button_resume.png").convert_alpha()
 options_img = pg.image.load("graph/button_options.png").convert_alpha()
 quit_img = pg.image.load("graph/button_quit.png").convert_alpha()
@@ -79,42 +81,51 @@ minus_button = Button(300, 400, minus_img, 1)
 # --- Murs ---
 walls = []
 
+############################## création automatique des tirs du vaisseau  ##################################
+# Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
+MISSILE_EVENT = pg.USEREVENT + 1                # pg.USERVENT : correspont à un nombre fixe que Pygame connait. MISSILE_EVENT aura son propre identifiant numérique
+pg.time.set_timer(MISSILE_EVENT, 1000)          # pg.time.set_timer : fonction de Pygame qui déclenche régulièrement (1000=toutes les secondes) un événement dans la file des événements (pg.event.get()).
+
 ############################## création des ennemis ##################################
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE) # liste contenant tous les ennemis 
 
+
+########################################################################################################################
+########################################################################################################################
 ############################## Boucle principale ##################################
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
-    font = pg.font.SysFont("Arial", 24, True)   # police pour affichage texte
 
+    #--- évènements ------------------------------------------------------------
     for e in pg.event.get():
         if e.type == pg.QUIT:                   # On verifie si on quitte le jeu
             running = False
 
         if game_paused == False:
-            if e.type == MISSILE_EVENT:         # Partie de la boucle creation des missiles
-                nouvMissile = creationMissile((player.rect.centerx - 4), (player.rect.top - 10), 1, SIZE, "vaisseau") # Creation d'un missile au dessus du joueur
-                missilesVaisseau.add(nouvMissile) # Ajout missile dans grp missile
-                mixer.music.play()
+            # recherche de l'évènement : MISSILE_EVENT
+            if e.type == MISSILE_EVENT:
+                nouvMissile = creationMissile((player.rect.centerx - 4), (player.rect.top - 10), 1, SIZE, "vaisseau")   # Creation d'un missile au dessus du vaisseau
+                missilesVaisseau.add(nouvMissile)
+                sound_shooting.play()                
+            # recherche de l'évènement : touche appuyée
             if e.type == pg.KEYDOWN:
-                if e.key == pg.K_SPACE:         # On verifie que la touche "espace" est appuyée pour pauser le jeu
+                # si la touche "espace" est appuyée
+                if e.key == pg.K_SPACE:
                     game_paused = True
     
-    #--- affichages -------------------------------------------------------------
-    screen.blit(bg_img, (0, 0))     # affiche l'image sur la fenêtre graphique aux coordonées (0, 0)        
-    enemyGroup.draw(screen)         # .draw dessine automatiquement tous les sprites de enemyGroup dans screen
-    playerGroup.draw(screen)        # affiche le vaisseau
-    missilesVaisseau.draw(screen)   # .draw dessine automatiquement tous les sprites de missilesVaisseau dans screen
-    textScore = font.render(f"Score : {score}", True, (255, 255, 255))   # crée une surface "texte" pour le score
-    textPause = font.render("\"ESPACE\" pour mettre pause", True, (255, 255, 255))   # crée une surface "texte" pour indiquer comment pauser, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
-    textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
-    screen.blit(textScore, (650, 10))                               # affiche le score en haut à droite
-    screen.blit(textPause, (250, 10))                               # affiche "PAUSE" en bas à gauche
-    #pv_vaisseau(pv_joueur, screen, fheart, eheart, gameover_img)    # affiche les pv du vaisseau
-   
+    #--- affichage de la page du jeu-------------------------------------------------------------
+    screen.blit(bg_img, (0, 0))         # affiche l'image de fond sur la fenêtre graphique aux coordonées (0, 0)        
+    playerGroup.draw(screen)            # dessine le vaisseau
+    enemyGroup.draw(screen)             # dessine tous les ennemis
+    missilesVaisseau.draw(screen)       # dessine tous les missiles du vaisseau
+    # TODO : missilesEnemies.draw(screen)   # dessine tous les missiles des ennemis
+    screen.blit(textScore, (650, 10))   # affiche le score en haut à droite
+    screen.blit(textPause, (250, 10))   # affiche le texte de pause en haut
+    # TODO :  # dessine les points de vie du vaisseau
+
+    #--- affichage du menu par dessus la page du jeu-------------------------------------------------------------
     if game_paused == True:
-        overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA) # Crée une surface transparente
         overlay.fill((0, 0, 0, 160)) 
         screen.blit(overlay, (0, 0))
 
@@ -146,12 +157,12 @@ while running:
                 optionVolume -= 0.1
                 if optionVolume < 0.0:
                     optionVolume = 0.0
-                mixer.music.set_volume(optionVolume)
+                sound_shooting.set_volume(optionVolume) 
             if plus_button.draw(screen):
                 optionVolume += 0.1
                 if optionVolume > 1.0:
                     optionVolume = 1.0
-                mixer.music.set_volume(optionVolume)
+                sound_shooting.set_volume(optionVolume) 
             if back_button.draw(screen):
                 menu_state = "options"
         elif menu_state == "keys":              # Verification de si audio à été cliqué
@@ -160,9 +171,9 @@ while running:
         # -------- création d'un missile quand on appuie sur une touche
         # TODO : si telle touche est appuyée alors:
             # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
+    
+    #--- actions du joueur-------------------------------------------------------------
     if game_paused == False:
-
-
         #--- déplacements ----------------------------------------
         player.update(screen)                       # déplacement du vaisseau
         missilesVaisseau.update()                   # déplacement de tous les missiles du vaisseau
