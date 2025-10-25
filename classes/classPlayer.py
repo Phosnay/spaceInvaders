@@ -19,7 +19,7 @@ class Player(pg.sprite.Sprite):
         super().__init__()                                  # Appeller le constructeur de la classe mère (pg.sprite.Sprite).
         self.image = image.copy()                           # faire une copie de l’image donnée, pour éviter de modifier l’original
         self.rect = self.image.get_rect(topleft=(x, y))     # associer l'image à un rectangle dont le coin supérieur gauche est en x, y
-        self.powerPlayer = powerPlayer
+        self.power = powerPlayer
         self.speed = speed
 
     def update(self, screen):
@@ -41,3 +41,36 @@ class Player(pg.sprite.Sprite):
         # empêche le vaisseau de sortir de l'écran avec clamp
         screen_rect = screen.get_rect()     # récupère le rectangle de la fenêtre (x=0, y=0, width, height).
         self.rect.clamp_ip(screen_rect)     # recadre le vaisseau à l’intérieur de cette zone.
+
+    def takeDamage(self, life, screen):
+        """
+        Réduit les points de vie et arrêt du jeu si le vaisseau tombe à 0.  
+        Affichage des points de vie (coeurs).  
+        life: point de vie  
+        screen: écran  
+        """
+        fheart = pg.image.load("graph/fullheart.png").convert_alpha()
+        fheart = pg.transform.scale(fheart, (50, 50))
+        eheart = pg.image.load("graph/emptyheart.png").convert_alpha()
+        eheart = pg.transform.scale(eheart, (50, 50))
+        self.power -= life
+
+        if self.power == 3:
+            screen.blit(fheart, (10,10))
+            screen.blit(fheart, (60,10))
+            screen.blit(fheart, (110,10))
+        elif self.power == 2:
+            screen.blit(fheart, (10,10))
+            screen.blit(fheart, (60,10))
+            screen.blit(eheart, (110,10))
+        elif self.power == 1:
+            screen.blit(fheart, (10,10))
+            screen.blit(eheart, (40,10))
+            screen.blit(eheart, (70,10))
+        elif self.power <= 0:
+            gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
+            gameover_img = pg.transform.scale(gameover_img, screen.get_size())
+            screen.blit(eheart, (10,10))
+            screen.blit(eheart, (40,10))
+            screen.blit(eheart, (70,10))
+            screen.blit(gameover_img, (0,0))
