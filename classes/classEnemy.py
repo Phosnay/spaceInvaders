@@ -27,21 +27,23 @@ class Enemy(pg.sprite.Sprite):
         """
         self.rect.x += self.speed                           # selon la vitesse (speed) définie automatiquement dans def __init__
 
-    def takeDamage(self, life, screen):
+    def takeDamage(self, damage):
         """
         Réduit les points de vie et tue l'ennemi s'il tombe à 0.  
         Changement de l'image de l'ennemi selon ses points de vie.  
+        Destruction de l'ennemi à 0 point de vie.
         life: point de vie  
         screen: écran  
         """
-        self.power -= life
+        self.power -= damage
         if self.power == 2:
             enemyMedium_img = pg.image.load("graph/space12.1.png").convert_alpha()
-            enemyMedium_img = pg.transform.scale(enemyMedium_img, screen.get_size())
-            self.image = enemyMedium_img
+            self.image = enemyMedium_img.copy()
+
         if self.power == 1:
             enemyWeak_img = pg.image.load("graph/space13.1.png").convert_alpha()
-            enemyWeak_img = pg.transform.scale(enemyWeak_img, screen.get_size())
-            self.image = enemyWeak_img
+            self.image = enemyWeak_img.copy()
         if self.power <= 0:
             self.kill()
+            return True
+        return False

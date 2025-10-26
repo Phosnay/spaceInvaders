@@ -4,6 +4,7 @@ from classes.classButton import Button
 from classes.classPlayer import Player
 from fonctions.ennemis import fillEnemyGroup, directionOfEnemies, detectCollision
 from fonctions.missiles import creationMissile
+from fonctions.vaisseau import displayHeart, fillHeartGroup
 
 pg.init()   # sert à initialiser tous les modules de Pygame (display, time, surface, mixer (mais peut échouer silencieusement), event, key, mouse, font, )
 
@@ -27,20 +28,30 @@ ENEMYSTART_X = (WIDTH - ((10 * SIZE) + (9 * ENEMYSPACE_X))) // 2  # positionneme
 screen = pg.display.set_mode((WIDTH, HEIGHT))           # display=gère l'affichage, set_mode=une fenêtre graphique
 clock = pg.time.Clock()                                 # time.Clock=horloge interne
 font = pg.font.SysFont("Arial", 24, True)               # police pour affichage texte
-overlay = pg.Surface(screen.get_size(), pg.SRCALPHA)    # Crée une surface transparente. remplacé (WIDTH, HEIGHT) par screen.get_size()
+overlay = pg.Surface(screen.get_size(), pg.SRCALPHA)    # Crée une surface où l'on pourra gérer la transparente. remplacé (WIDTH, HEIGHT) par screen.get_size()
+running = True
 
 missilesVaisseau = pg.sprite.Group()    # stockage des missiles du vaisseau
 missilesEnemies = pg.sprite.Group()     # stockage des missiles des ennemis
 playerGroup = pg.sprite.GroupSingle()   # stockage du vaisseau
 
-score = 0            # initialisation du score
-pv_joueur = 3        # Initialisation des pv (joueur)
-menu_state = "main"  # état du menu (base)
-game_paused = False  # Pour pauser le jeu (ici false = pas de pause)
+score = 0                   # initialisation du score
+pv_joueur = 3               # Initialisation des pv (joueur)
+damagePlayer = 1              # points perdus lors d'une collision
+damageEnemy = 1               # points perdus lors d'une collision
+menu_state = "main"         # état du menu général
+menu_options = "open"    # état du menu options
+game_paused = False         # Pour mettre en pause le jeu (ici false = pas de pause)
 
 textScore = font.render(f"Score : {score}", True, (255, 255, 255))                          # crée une surface "texte" pour le score
 textPause = font.render("\"ESPACE\"  : mettre en pause", True, (255, 255, 255))             # crée une surface "texte" pour indiquer comment mettre en pause, petit rappel : \ permet d'annuler le prochain charactère spécial (ici pour avoir des guillemets)
 textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
+gameover_img = pg.image.load("graph/gameover_img.png").convert_alpha()
+gameover_img = pg.transform.scale(gameover_img, (200,100))
+
+############################## image des points de vie du vaisseau #############################
+emptyHeart = pg.image.load("graph/emptyheart.png").convert_alpha()
+emptyHeart = pg.transform.scale(emptyHeart, (50, 50))
 
 ############################## Création du background #############################
 bg_img = pg.image.load("graph/scrollCropped.png").convert_alpha()   # chargement d'une image
@@ -51,8 +62,7 @@ bg_y = 0
 ############################## Création du vaisseau ###############################
 player_img = pg.image.load("graph/vaisseau01.png").convert_alpha()          # chargement d'une image, en gardant la transparence
 player_img = pg.transform.scale(player_img, (SIZE, SIZE))
-image = player_img
-player = Player(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, image, pv_joueur)
+player = Player(WIDTH//2 - SIZE//2, HEIGHT//1.1 - SIZE//2, player_img, pv_joueur)
 playerGroup.add(player)
 
 ############################## Création du menu ##################################
@@ -63,23 +73,22 @@ video_img = pg.image.load("graph/button_video.png").convert_alpha()
 audio_img = pg.image.load("graph/button_audio.png").convert_alpha()
 keys_img = pg.image.load("graph/button_keys.png").convert_alpha()
 back_img = pg.image.load("graph/button_back.png").convert_alpha()
-plus_img = pg.image.load("graph/button_plus.png").convert_alpha()
+plus_img = pg.image.load("graph/button_increase.png").convert_alpha()
 plus_img = pg.transform.scale(plus_img, (50, 50))
-minus_img = pg.image.load("graph/button_minus.png").convert_alpha()
+minus_img = pg.image.load("graph/button_decrease.png").convert_alpha()
 minus_img = pg.transform.scale(minus_img, (50, 50))
-sound = pg.image.load("graph/sound.png").convert_alpha()
-resume_button = Button(304, 125, resume_img, 1)
-options_button = Button(297, 250, options_img, 1)
-quit_button = Button(336, 375, quit_img, 1)
-audio_button = Button(250, 250, audio_img, 1)
-video_button = Button(250, 125, video_img, 1)
-keys_button = Button(265, 375, keys_img, 1)
-back_button = Button(350, 500, back_img, 1)
-plus_button = Button(500, 400, plus_img, 1)
-minus_button = Button(300, 400, minus_img, 1)
+# sound_img = pg.image.load("graph/sound.png").convert_alpha()
+# attention, ne pas mettre les boutons aux mêmes coordonnées dinon le clic de la souris actionne aussi le bouton qu'elle affiche
+resume_button = Button(100, 125, resume_img, 1)
+options_button = Button(100, 250, options_img, 1)
+quit_button = Button(100, 375, quit_img, 1)
+audio_button = Button(300, 250, audio_img, 1)
+video_button = Button(300, 125, video_img, 1)
+keys_button = Button(300, 375, keys_img, 1)
+back_button = Button(500, 600, back_img, 1)
+plus_button = Button(500, 500, plus_img, 1)
+minus_button = Button(300, 500, minus_img, 1)
 
-# --- Murs ---
-walls = []
 
 ############################## création automatique des tirs du vaisseau  ##################################
 # Ajoute dans la file d’événements un événement de type MISSILE_EVENT toutes les secondes.
@@ -88,12 +97,11 @@ pg.time.set_timer(MISSILE_EVENT, 1000)          # pg.time.set_timer : fonction d
 
 ############################## création des ennemis ##################################
 enemyGroup = fillEnemyGroup(6, 10, WIDTH, SIZE) # liste contenant tous les ennemis 
-
+heartGroup = fillHeartGroup(4)
 
 ########################################################################################################################
 ########################################################################################################################
 ############################## Boucle principale ##################################
-running = True
 while running:
     dt = clock.tick(FPS) / 1000.0               # dt = temps écoulé entre 2 frames, /1000.0 convertit les millisecondes en secondes
 
@@ -102,7 +110,7 @@ while running:
         if e.type == pg.QUIT:                   # On verifie si on quitte le jeu
             running = False
 
-        if game_paused == False:
+        if not game_paused:
             # recherche de l'évènement : MISSILE_EVENT
             if e.type == MISSILE_EVENT:
                 nouvMissile = creationMissile((player.rect.centerx - 4), (player.rect.top - 10), 1, SIZE, "vaisseau")   # Creation d'un missile au dessus du vaisseau
@@ -116,84 +124,104 @@ while running:
     
     #--- affichage de la page du jeu-------------------------------------------------------------
     screen.blit(bg_img, (0, 0))         # affiche l'image de fond sur la fenêtre graphique aux coordonées (0, 0)        
-    playerGroup.draw(screen)            # dessine le vaisseau
+    heartGroup.draw(screen)             # dessine les coeurs
     enemyGroup.draw(screen)             # dessine tous les ennemis
     missilesVaisseau.draw(screen)       # dessine tous les missiles du vaisseau
     # TODO : missilesEnemies.draw(screen)   # dessine tous les missiles des ennemis
+    textScore = font.render(f"Score : {score}", True, (255, 255, 255))                          # crée une surface "texte" pour le score
     screen.blit(textScore, (650, 10))   # affiche le score en haut à droite
     screen.blit(textPause, (250, 10))   # affiche le texte de pause en haut
-    # TODO :  # dessine les points de vie du vaisseau
+    playerGroup.draw(screen)            # dessine le vaisseau
+    displayHeart(heartGroup, pv_joueur, emptyHeart)    # dessine les points de vie du vaisseau
+
+    #--- affichage du game-over par dessus la page du jeu-------------------------------------------------------------
+    if pv_joueur <= 0:
+        game_paused = True
+        overlay.fill((0, 0, 0, 160))           # remplit la surface overlay avec une couleur semi-transparente. 
+        screen.blit(overlay, (0, 0))
+        screen.blit(gameover_img, (300,300))
 
     #--- affichage du menu par dessus la page du jeu-------------------------------------------------------------
-    if game_paused == True:
-        overlay.fill((0, 0, 0, 160)) 
+    if game_paused and pv_joueur > 0:
+        # Quand game_paused == True, la partie overlay.blit est exécutée, donc la surface transparente apparaît.
+        overlay.fill((0, 0, 0, 160))           # remplit la surface overlay avec une couleur semi-transparente. 
         screen.blit(overlay, (0, 0))
 
-        if menu_state == "main":                # Verification de si menu principal est actif
-            if resume_button.draw(screen):      # Bouton reprendre le jeu
-                game_paused = False
-            elif options_button.draw(screen):   # Bouton option 
-                menu_state = "options"          # change au menu "option"
-            elif quit_button.draw(screen):      # Bouton qui permet de quitter le jeu
+        if menu_state == "main":                # si menu principal est actif (lorsqu'on appuit sur la barre d'espace)
+            if resume_button.draw(screen):      # affichage du bouton : reprendre le jeu
+                game_paused = False             
+            elif options_button.draw(screen):     # affichage du bouton : options 
+                menu_state = "options"          # pour passer au menu "option"
+            elif quit_button.draw(screen):        # affichage du bouton : quitter le jeu
                 running = False                 # On arrete la boucle principale
 
-        if menu_state == "options":             # Verification de si option à été cliqué
+        elif menu_state == "options":             # Verification de si option à été cliqué
             if video_button.draw(screen):
-                menu_state = "video"            # Pass = Placeholder
+                menu_state = "video"
             elif audio_button.draw(screen):
-                menu_state = "audio"            # change au menu "audio"
+                menu_state = "audio"
             elif keys_button.draw(screen):
                 menu_state = "keys"
             elif back_button.draw(screen):
                 menu_state = "main"
 
-        if menu_state == "video":               # Verification de si video à été cliqué
+        elif menu_state == "video":               # Verification de si video à été cliqué
             if back_button.draw(screen):
-                menu_state = "options"
+                # TODO : 
+                menu_options = "options"
 
-        elif menu_state == "audio":             # Verification de si audio à été cliqué
-            screen.blit(textVolume, (350, 200))
+        elif menu_state == "audio":               # Verification de si audio à été cliqué
+            screen.blit(textVolume, (350, 400))
             if minus_button.draw(screen):
                 optionVolume -= 0.1
+                screen.blit(textVolume, (350, 400))
                 if optionVolume < 0.0:
                     optionVolume = 0.0
                 sound_shooting.set_volume(optionVolume) 
-            if plus_button.draw(screen):
+                textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
+            elif plus_button.draw(screen):
                 optionVolume += 0.1
+                screen.blit(textVolume, (350, 400))
                 if optionVolume > 1.0:
                     optionVolume = 1.0
-                sound_shooting.set_volume(optionVolume) 
+                sound_shooting.set_volume(optionVolume)
+                textVolume = font.render(f"Volume : {int(optionVolume * 100)}%", True, (255, 255, 255))
+            elif back_button.draw(screen):
+                menu_state = "options"
+        
+        elif menu_state == "keys":                 # Verification de si keys à été cliqué
             if back_button.draw(screen):
                 menu_state = "options"
-        elif menu_state == "keys":              # Verification de si audio à été cliqué
-            if back_button.draw(screen):
-                menu_state = "options"
-        # -------- création d'un missile quand on appuie sur une touche
-        # TODO : si telle touche est appuyée alors:
-            # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
-    
+        
     #--- actions du joueur-------------------------------------------------------------
-    if game_paused == False:
+    if not game_paused:
+        # Quand game_paused == False, la partie overlay.blit n’est pas exécutée, donc la surface transparente disparaît.
         #--- déplacements ----------------------------------------
         player.update(screen)                       # déplacement du vaisseau
         missilesVaisseau.update()                   # déplacement de tous les missiles du vaisseau
         enemyGroup.update()                         # déplacement de tous les ennemis
         directionOfEnemies(enemyGroup, WIDTH, SIZE) # direction des déplacements des ennemis
+
         # TODO : déplacement de tous les missiles des ennemis
+        
+        # -------- création d'un missile quand on appuie sur une touche
+        # TODO : si telle touche est appuyée alors:
+            # missilesVaisseau.add(creationMissile(player.centerx - 5, player.top - 10, 1, int(SIZE / 10), "vaisseau"))
 
         # Collision entre les  missiles du vaisseau et des ennemis
-        score = detectCollision(missilesVaisseau, enemyGroup, score, SIZE)
+        score += detectCollision(missilesVaisseau, enemyGroup, score, damageEnemy)
         # Collision entre le vaisseau et les ennemis
-        pv_joueur = detectCollision(playerGroup, enemyGroup, pv_joueur, SIZE//2)
+        pv_joueur -= detectCollision(enemyGroup, playerGroup, pv_joueur, damagePlayer)
         # TODO : Collision entre les missiles des ennemis et le vaisseau
 
-
-    # LOGIQUE
-    for w in walls:
-        pg.draw.rect(screen, WCOLOR, w)
+    # double buffering :
+    # pygame dessine tout le contenu sur un écran « hors écran » (back buffer),
+    # il appelle pg.display.flip() pour basculer ce buffer vers l’écran visible (front buffer),
+    # tout ce qu'il a dessiné devient visible à l’écran en une seule opération.
     pg.display.flip()
 
-    pg.display.update()
+
+ #   pg.display.update()
 pg.quit(); sys.exit()
 
 

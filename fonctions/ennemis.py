@@ -6,17 +6,21 @@ START_Y = 100                   # distance entre le haut de l'écran et la posit
 DOWN = 10                       # distance de chaque déplacement des ennemis vers le bas
 
 ################ instanciation des ennemis ###########################
-def fillEnemyGroup(ROWS, COLS, WIDTH, SIZE):
+def fillEnemyGroup(rows, cols, WIDTH, SIZE):
+    """
+    Instanciation des ennemis.  
+    rows: nombre de pixels entre deux rangées  
+    cols: nombre de pixels entre deux colonnes  
+    WIDTH: largeur de l'écran  
+    SIZE: taille de l'image  
+    """
     Start_X = (WIDTH - ((10 * SIZE) + (9 * SPACE_X))) // 2                      # positionnement du premier ennemi pour que la ligne soit centrée
     enemyGroup = pg.sprite.Group()                                              # conteneur gérant plusieurs sprites.
     enemyStrong_img = pg.image.load("graph/space10.1.png").convert_alpha()      # chargement d'une image, en gardant la transparence
-    enemyStrong_img = pg.transform.scale(enemyStrong_img, (SIZE, SIZE))         # taille de l'image imposée
     enemyMedium_img = pg.image.load("graph/space12.1.png").convert_alpha()
-    enemyMedium_img = pg.transform.scale(enemyMedium_img, (SIZE, SIZE))
     enemyWeak_img = pg.image.load("graph/space13.1.png").convert_alpha()
-    enemyWeak_img = pg.transform.scale(enemyWeak_img, (SIZE, SIZE))
-    for row in range(ROWS):
-        for col in range(COLS):
+    for row in range(rows):
+        for col in range(cols):
             x = Start_X + col * (SIZE + SPACE_X)
             y = START_Y + row * (SIZE + SPACE_Y)
             # selon la rangée, changer l'image des ennemis
@@ -44,32 +48,31 @@ def directionOfEnemies(enemyGroup, WIDTH, SIZE):
     for enemy in enemyGroup:
         if enemy.rect.x + SIZE >= WIDTH or enemy.rect.x < 0:        # si un seul vaisseau touche le bord
             inScreen = False
-    if inScreen == False:
+    if not inScreen:
         for enemy in enemyGroup:
             enemy.speed *= -1           # changement de direction
             enemy.rect.y += DOWN
 
 ################ Collision entre deux sprites ###########################
-def detectCollision(group1, group2, point, screen):
+def detectCollision(group1, group2, points, damage):
     """
-    Détecte les collisions entre deux objets    
-    Supprime l'objet de la première collection  
-    Retire des point de vie à l'objet de la deuxième collection  
+    Détecte les collisions entre deux groupes de sprites.    
+    Supprime l'objet du premier groupe (group1).  
+    Retire des point de vie à l'objet du deuxième groupe (group2).  
+    
     group1: ennemi ou missile  
     group2: vaisseau ou ennemi  
-    point: point de vie  
-
+    point: points de vie  
+    damage: points perdus  
+    screen: écran
     """
     collisions = pg.sprite.groupcollide(group1, group2, True, False)
     for sprite1, sprite2_hit in collisions.items():
         for sprite in sprite2_hit:
-            sprite.takeDamage(1, screen)  # enlève 1 point de vie
-            pg.display.flip()
-            if sprite.power <= 0:
-                point = point + 1
-    return point 
+            if sprite.takeDamage(damage):  
+                return 1
+    return 0 
                 
-      #  player.takeDamage(player.powerPlayer, fheart, eheart, screen, gameover_img)
 
 # pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)
 # compare tous les sprites des deux groupes.
