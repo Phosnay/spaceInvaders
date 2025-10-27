@@ -40,7 +40,6 @@ pv_joueur = 3               # Initialisation des pv (joueur)
 damagePlayer = 1              # points perdus lors d'une collision
 damageEnemy = 1               # points perdus lors d'une collision
 menu_state = "main"         # état du menu général
-menu_options = "open"    # état du menu options
 game_paused = False         # Pour mettre en pause le jeu (ici false = pas de pause)
 
 textScore = font.render(f"Score : {score}", True, (255, 255, 255))                          # crée une surface "texte" pour le score
